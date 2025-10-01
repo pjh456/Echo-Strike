@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -O2")
 
+set(CMAKE_PREFIX_PATH "E:/Programs/libsdl/SDL;E:/Programs/libsdl/SDL-image;E:/Programs/libsdl/SDL-ttf;")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
@@ -30,9 +32,11 @@ target_link_libraries(main
     PRIVATE SDL3_ttf::SDL3_ttf)
 
 if(WIN32)
-    add_custom_command(
+add_custom_command(
         TARGET main POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3::SDL3-shared> $<TARGET_FILE_DIR:main>
+        COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3_ttf::SDL3_ttf> $<TARGET_FILE_DIR:main>
+        COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3_image::SDL3_image> $<TARGET_FILE_DIR:main>
         VERBATIM
     )
 endif()
