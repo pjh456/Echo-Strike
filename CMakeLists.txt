@@ -12,5 +12,5 @@ find_package(SDL3 REQUIRED)
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/pjh_json)
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/echo_strike)
 
-add_executable(main ${CMAKE_SOURCE_DIR}/tests/test_vec2.cpp)
+add_executable(main ${CMAKE_SOURCE_DIR}/tests/test_timer.cpp)
 target_link_libraries(main PRIVATE echo_strike_lib)
