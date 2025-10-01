@@ -1,4 +1,5 @@
 build
 .vscode
 include/SDL3
+include/SDL_image
 include/pjh_json
