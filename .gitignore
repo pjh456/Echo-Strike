@@ -1,0 +1,4 @@
+build
+.vscode
+include/SDL3
+include/pjh_json
