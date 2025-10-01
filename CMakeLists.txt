@@ -15,6 +15,7 @@ set(CMAKE_PREFIX_PATH E:/Programs/SDL-static;E:/Programs/SDL-image)
 # add_subdirectory(include/SDL EXCLUDE_FROM_ALL)
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3 Headers SDL3-shared)
 find_package(SDL3_image REQUIRED CONFIG)
+find_package(SDL3_ttf REQUIRED CONFIG)
 
 # add_subdirectory(${CMAKE_SOURCE_DIR}/include/SDL_image EXCLUDE_FROM_ALL)
 
@@ -26,7 +27,8 @@ add_executable(main ${CMAKE_SOURCE_DIR}/tests/test_sdl.cpp)
 target_link_libraries(main
     PRIVATE echo_strike_lib
     PRIVATE SDL3::SDL3
-    PRIVATE SDL3_image::SDL3_image)
+    PRIVATE SDL3_image::SDL3_image
+    PRIVATE SDL3_ttf::SDL3_ttf)
 
 if(WIN32)
     add_custom_command(
