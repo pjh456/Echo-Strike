@@ -28,7 +28,10 @@ Vec2 Vec2::operator*(int ratio) const
 
 Vec2 Vec2::operator/(int ratio) const
 {
-    return Vec2(this->m_x / ratio, this->m_y / ratio);
+    if (ratio == 0)
+        return Vec2(0, 0);
+    else
+        return Vec2(this->m_x / ratio, this->m_y / ratio);
 }
 
 Vec2 &Vec2::operator+=(const Vec2 &other)
@@ -61,9 +64,28 @@ Vec2 &Vec2::operator*=(int ratio)
 
 Vec2 &Vec2::operator/=(int ratio)
 {
-    this->m_x /= ratio;
-    this->m_y /= ratio;
+    if (ratio == 0)
+        this->m_x = this->m_y = 0;
+    else
+    {
+        this->m_x /= ratio;
+        this->m_y /= ratio;
+    }
+
     return *this;
+}
+
+float Vec2::length() const
+{
+    return std::sqrt((m_x * m_x) + (m_y * m_y));
+}
+
+Vec2 Vec2::normalize() const
+{
+    auto len = this->length();
+    if (len == 0)
+        return Vec2(0, 0);
+    return Vec2(m_x / len, m_y / len);
 }
 
 float Vec2::euclidean_dis(const Vec2 &other) const

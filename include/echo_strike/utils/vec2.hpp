@@ -34,6 +34,9 @@ public:
     Vec2 &operator/=(int);
 
 public:
+    float length() const;
+    Vec2 normalize() const;
+
     float euclidean_dis(const Vec2 &) const;
     int manhattan_dis(const Vec2 &) const;
 };
