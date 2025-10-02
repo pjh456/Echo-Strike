@@ -11,7 +11,7 @@ int main()
     SDL_Init(SDL_INIT_VIDEO);
 
     Atlas atlas;
-    auto window = SDL_CreateWindow("atlas test", 800, 600, 0);
+    auto window = SDL_CreateWindow("atlas test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
     std::cout << atlas.load(renderer, "E:/Projects/games/echo strike/resources/enemy/aim/{}.png", 10) << std::endl;
     Animation animation(50);
