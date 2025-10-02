@@ -42,7 +42,7 @@ int main()
         t.update(dur_time.count());
 
         SDL_FRect rect = {200, 150, 400, 300};
-        SDL_RenderTexture(renderer, &atlas[atlas_idx], NULL, &rect);
+        SDL_RenderTexture(renderer, atlas[atlas_idx].get_texture(), NULL, &rect);
 
         SDL_RenderPresent(renderer);
     }

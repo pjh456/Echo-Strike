@@ -25,7 +25,7 @@ bool Atlas::push_back(SDL_Renderer *renderer, const char *path)
     auto tex = IMG_LoadTexture(renderer, path);
     if (tex == nullptr)
         return false;
-    textures.push_back(tex);
+    textures.emplace_back(tex);
     return true;
 }
 
@@ -34,7 +34,9 @@ bool Atlas::insert(SDL_Renderer *renderer, size_t index, const char *path)
     auto tex = IMG_LoadTexture(renderer, path);
     if (tex == nullptr)
         return false;
-    textures.insert(textures.begin() + index, tex);
+
+    Image temp(tex);
+    textures.insert(textures.begin() + index, std::move(temp));
     return true;
 }
 
@@ -54,11 +56,9 @@ size_t Atlas::load(SDL_Renderer *renderer, const char *template_str, size_t coun
 
 void Atlas::clear()
 {
-    for (auto &tex : textures)
-        SDL_DestroyTexture(tex);
     textures.clear();
 }
 
-SDL_Texture &Atlas::operator[](size_t index) { return *textures[index]; }
+Image &Atlas::operator[](size_t index) { return textures[index]; }
 
-const SDL_Texture &Atlas::operator[](size_t index) const { return *textures[index]; }
+const Image &Atlas::operator[](size_t index) const { return textures[index]; }

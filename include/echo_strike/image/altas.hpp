@@ -1,6 +1,8 @@
 #ifndef INCLUDE_ATLAS
 #define INCLUDE_ATLAS
 
+#include <echo_strike/image/image.hpp>
+
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
@@ -9,7 +11,7 @@
 class Atlas
 {
 private:
-    std::vector<SDL_Texture *> textures;
+    std::vector<Image> textures;
 
 public:
     Atlas();
@@ -31,8 +33,8 @@ public:
     void clear();
 
 public:
-    SDL_Texture &operator[](size_t);
-    const SDL_Texture &operator[](size_t) const;
+    Image &operator[](size_t);
+    const Image &operator[](size_t) const;
 };
 
 #endif // INCLUDE_ATLAS
