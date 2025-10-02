@@ -10,7 +10,7 @@
 class CollisionManager
 {
 public:
-    CollisionManager &instance();
+    static CollisionManager &instance();
     CollisionBox &create_collision_box();
     void destroy_collision_box(CollisionBox &);
 
@@ -25,6 +25,7 @@ public:
 
 public:
     size_t size() const { return boxes.size(); }
+    void clear() { boxes.clear(); }
 
     void process_collide();
 };

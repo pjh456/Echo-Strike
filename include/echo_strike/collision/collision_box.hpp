@@ -11,18 +11,24 @@
 #include <functional>
 
 class CollisionManager;
+class Entity;
 
 class CollisionBox
 {
     friend class CollisionManager;
 
+public:
+    using Callback = std::function<void(Entity *)>;
+
 private:
-    std::function<void()> collide_callback;
+    Callback collide_callback;
 
     CLASS_PROPERTY(bool, enable);
     CLASS_PROPERTY(Rect, rect)
     CLASS_PROPERTY(CollisionLayer, src)
     CLASS_PROPERTY(CollisionLayer, dst)
+
+    CLASS_POINTER(Entity, entity);
 
 private:
     CollisionBox() = default;
@@ -34,7 +40,7 @@ public:
     DEFAULT_EQUAL_OPERATOR(CollisionBox)
 
 public:
-    void on_collide(std::function<void()> &&callback) { collide_callback = callback; }
+    void on_collide(Callback &&callback) { collide_callback = std::move(callback); }
 
     void render_border(SDL_Renderer *renderer) const
     {
