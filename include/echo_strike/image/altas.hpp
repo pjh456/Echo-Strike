@@ -24,8 +24,12 @@ public:
     Atlas &operator=(Atlas &&) noexcept;
 
 public:
+    bool push_back(SDL_Renderer *, SDL_Texture *);
     bool push_back(SDL_Renderer *, const char *);
+
+    bool insert(SDL_Renderer *, size_t, SDL_Texture *);
     bool insert(SDL_Renderer *, size_t, const char *);
+
     size_t load(SDL_Renderer *, const char *, size_t);
 
     size_t size() { return textures.size(); }

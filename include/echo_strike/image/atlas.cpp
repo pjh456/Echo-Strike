@@ -20,24 +20,32 @@ Atlas &Atlas::operator=(Atlas &&other) noexcept
     return *this;
 }
 
-bool Atlas::push_back(SDL_Renderer *renderer, const char *path)
+bool Atlas::push_back(SDL_Renderer *renderer, SDL_Texture *tex)
 {
-    auto tex = IMG_LoadTexture(renderer, path);
     if (tex == nullptr)
         return false;
     textures.emplace_back(tex);
     return true;
 }
 
-bool Atlas::insert(SDL_Renderer *renderer, size_t index, const char *path)
+bool Atlas::push_back(SDL_Renderer *renderer, const char *path)
 {
-    auto tex = IMG_LoadTexture(renderer, path);
+    return this->push_back(renderer, IMG_LoadTexture(renderer, path));
+}
+
+bool Atlas::insert(SDL_Renderer *renderer, size_t index, SDL_Texture *tex)
+{
     if (tex == nullptr)
         return false;
 
     Image temp(tex);
     textures.insert(textures.begin() + index, std::move(temp));
     return true;
+}
+
+bool Atlas::insert(SDL_Renderer *renderer, size_t index, const char *path)
+{
+    return this->insert(renderer, index, IMG_LoadTexture(renderer, path));
 }
 
 size_t Atlas::load(SDL_Renderer *renderer, const char *template_str, size_t counts)
