@@ -17,6 +17,28 @@ Timer::Timer(std::function<void()> &&callback)
     timeout_callback = std::move(callback);
 }
 
+Timer::Timer(Timer &&other) noexcept
+    : m_pass_time(other.m_pass_time),
+      m_timeout_time(other.m_timeout_time),
+      m_paused(other.m_paused),
+      m_shotted(other.m_shotted),
+      m_one_shot(other.m_one_shot),
+      timeout_callback(std::move(other.timeout_callback))
+{
+}
+Timer &Timer::operator=(Timer &&other) noexcept
+{
+    if (this == &other)
+        return *this;
+
+    m_pass_time = other.m_pass_time;
+    m_timeout_time = other.m_timeout_time;
+    m_paused = other.m_paused;
+    m_shotted = other.m_shotted;
+    m_one_shot = other.m_one_shot;
+    timeout_callback = std::move(other.timeout_callback);
+}
+
 void Timer::restart() { m_pass_time = 0, m_paused = false; }
 
 void Timer::pause() { m_paused = true; }
