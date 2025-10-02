@@ -133,5 +133,6 @@ void Animation::render(SDL_Renderer *renderer) const
     else
         dst.y += (frame.img->get_height() / 2);
 
-    SDL_RenderTexture(renderer, frame.img->get_texture(), &frame.src, &dst);
+    auto temp_src = frame.src.to_frect();
+    SDL_RenderTexture(renderer, frame.img->get_texture(), &temp_src, &dst);
 }

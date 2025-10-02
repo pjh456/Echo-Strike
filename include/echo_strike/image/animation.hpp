@@ -4,6 +4,7 @@
 #include <echo_strike/utils/class_marcos.hpp>
 
 #include <echo_strike/utils/vec2.hpp>
+#include <echo_strike/utils/rect.hpp>
 #include <echo_strike/core/timer.hpp>
 #include <echo_strike/image/image.hpp>
 #include <echo_strike/image/altas.hpp>
@@ -26,7 +27,7 @@ private:
     struct Frame
     {
         const Image *img = nullptr;
-        SDL_FRect src;
+        Rect src;
     };
 
 private:
