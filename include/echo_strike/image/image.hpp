@@ -3,6 +3,8 @@
 
 #include <echo_strike/utils/class_marcos.hpp>
 
+#include <echo_strike/utils/vec2.hpp>
+
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
 
@@ -25,7 +27,12 @@ public:
     Image &operator=(Image &&) noexcept;
 
 public:
-    SDL_Texture *get_texture() const { return tex; }
+    Vec2 size() const { return Vec2(m_width, m_height); }
+
+    SDL_Texture *get_texture() const
+    {
+        return tex;
+    }
 };
 
 #endif // INCLUDE_IMAGE
