@@ -1,6 +1,8 @@
 #ifndef INCLUDE_COLOR
 #define INCLUDE_COLOR
 
+#include <echo_strike/utils/class_marcos.hpp>
+
 #include <random>
 
 struct Color
@@ -16,6 +18,10 @@ struct Color
         color.A = enable_alpha ? rand() % 256 : 255;
         return color;
     }
+    Color() : R(0), G(0), B(0), A(255) {}
+
+    DEFAULT_CONSTRUCTOR(Color)
+    DEFAULT_EQUAL_OPERATOR(Color)
 };
 
 #endif // INCLUDE_COLOR
