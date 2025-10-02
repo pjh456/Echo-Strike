@@ -7,12 +7,12 @@
 
 class Vec2
 {
-    CLASS_PROPERTY(int, x);
-    CLASS_PROPERTY(int, y);
+    CLASS_PROPERTY(float, x);
+    CLASS_PROPERTY(float, y);
 
 public:
     Vec2();
-    Vec2(int, int);
+    Vec2(float, float);
 
     DEFAULT_CONSTRUCTOR(Vec2);
 
@@ -23,22 +23,22 @@ public:
     Vec2 operator-(const Vec2 &) const;
     Vec2 operator*(const Vec2 &) const;
 
-    Vec2 operator*(int) const;
-    Vec2 operator/(int) const;
+    Vec2 operator*(float) const;
+    Vec2 operator/(float) const;
 
     Vec2 &operator+=(const Vec2 &);
     Vec2 &operator-=(const Vec2 &);
     Vec2 &operator*=(const Vec2 &);
 
-    Vec2 &operator*=(int);
-    Vec2 &operator/=(int);
+    Vec2 &operator*=(float);
+    Vec2 &operator/=(float);
 
 public:
     float length() const;
     Vec2 normalize() const;
 
     float euclidean_dis(const Vec2 &) const;
-    int manhattan_dis(const Vec2 &) const;
+    float manhattan_dis(const Vec2 &) const;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Vec2 &vec2)

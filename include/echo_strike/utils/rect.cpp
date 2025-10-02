@@ -2,7 +2,7 @@
 
 #include <echo_strike/utils/color.hpp>
 
-Rect::Rect(int x, int y, int w, int h)
+Rect::Rect(float x, float y, float w, float h)
     : m_x(x), m_y(y),
       m_width(w), m_height(h)
 {
@@ -14,7 +14,7 @@ Rect::Rect(const SDL_Rect &rect)
     : Rect(rect.x, rect.y, rect.w, rect.h) {}
 
 Rect::Rect(const SDL_FRect &rect)
-    : Rect((int)rect.x, (int)rect.y, (int)rect.w, (int)rect.h) {}
+    : Rect((float)rect.x, (float)rect.y, (float)rect.w, (float)rect.h) {}
 
 Vec2 Rect::position() const
 {

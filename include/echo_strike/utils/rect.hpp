@@ -12,13 +12,13 @@
 class Rect
 {
 private:
-    CLASS_PROPERTY(int, x);
-    CLASS_PROPERTY(int, y);
-    CLASS_PROPERTY(int, width);
-    CLASS_PROPERTY(int, height);
+    CLASS_PROPERTY(float, x);
+    CLASS_PROPERTY(float, y);
+    CLASS_PROPERTY(float, width);
+    CLASS_PROPERTY(float, height);
 
 public:
-    Rect(int, int, int, int);
+    Rect(float, float, float, float);
     Rect();
     Rect(const SDL_Rect &);
     Rect(const SDL_FRect &);
@@ -35,10 +35,10 @@ public:
     SDL_FRect to_frect() const;
 
 public:
-    int left() const { return m_x; }
-    int right() const { return m_x + m_width; }
-    int up() const { return m_y + m_height; }
-    int down() const { return m_y; }
+    float left() const { return m_x; }
+    float right() const { return m_x + m_width; }
+    float up() const { return m_y + m_height; }
+    float down() const { return m_y; }
 
 public:
     bool is_inside(const Vec2 &) const;
