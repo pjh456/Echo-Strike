@@ -32,8 +32,8 @@ public:
 
     size_t load(SDL_Renderer *, const char *, size_t);
 
-    size_t size() { return textures.size(); }
-    bool empty() { return textures.empty(); }
+    size_t size() const { return textures.size(); }
+    bool empty() const { return textures.empty(); }
     void clear();
 
 public:
