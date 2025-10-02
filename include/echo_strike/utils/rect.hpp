@@ -49,6 +49,9 @@ public:
 
     bool is_intersect(const Vec2 &) const;
     bool is_intersect(const Rect &) const;
+
+    void render_border(SDL_Renderer *) const;
+    void render_full(SDL_Renderer *) const;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Rect &rect)

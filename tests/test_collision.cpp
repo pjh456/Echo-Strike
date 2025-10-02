@@ -4,6 +4,8 @@
 
 #include <SDL3/SDL.h>
 
+class Entity;
+
 int main()
 {
     SDL_Init(SDL_INIT_VIDEO);
@@ -16,14 +18,14 @@ int main()
     box1.set_rect(Rect{100, 100, 200, 200});
     box1.set_enable(true);
     box1.on_collide(
-        []()
+        [](Entity *)
         { std::cout << "Box 1 collided!\n"; });
 
     auto &box2 = manager.create_collision_box();
     box2.set_rect(Rect{250, 150, 200, 200});
     box2.set_enable(true);
     box2.on_collide(
-        []()
+        [](Entity *)
         { std::cout << "Box 2 collided!\n"; });
 
     bool running = true;

@@ -1,5 +1,7 @@
 #include <echo_strike/utils/rect.hpp>
 
+#include <echo_strike/utils/color.hpp>
+
 Rect::Rect(int x, int y, int w, int h)
     : m_x(x), m_y(y),
       m_width(w), m_height(h)
@@ -106,4 +108,22 @@ bool Rect::is_intersect(const Rect &rect) const
         return false;
 
     return true;
+}
+
+void Rect::render_border(SDL_Renderer *renderer) const
+{
+    auto rect = to_frect();
+    static Color color(Color::random_color());
+
+    SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+    SDL_RenderRect(renderer, &rect);
+}
+
+void Rect::render_full(SDL_Renderer *renderer) const
+{
+    auto rect = to_frect();
+    static Color color(Color::random_color());
+
+    SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
+    SDL_RenderFillRect(renderer, &rect);
 }

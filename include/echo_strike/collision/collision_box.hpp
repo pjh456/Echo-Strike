@@ -42,15 +42,7 @@ public:
 public:
     void on_collide(Callback &&callback) { collide_callback = std::move(callback); }
 
-    void render_border(SDL_Renderer *renderer) const
-    {
-        auto rect = m_rect.to_frect();
-        // static Color color = Color::random_color();
-        static Color color(Color::random_color());
-
-        SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
-        SDL_RenderRect(renderer, &rect);
-    }
+    void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
 };
 
 #endif // INCLUDE_COLLISION_BOX
