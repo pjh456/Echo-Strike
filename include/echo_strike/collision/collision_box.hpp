@@ -48,6 +48,7 @@ public:
 
 public:
     void on_collide(Callback &&callback) { collide_callback = std::move(callback); }
+    Callback get_callback() const { return collide_callback; }
 
     void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
 
