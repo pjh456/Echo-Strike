@@ -12,8 +12,9 @@ CollisionManager &CollisionManager::instance()
 
 CollisionBox *CollisionManager::create_collision_box()
 {
-    boxes.push_back(new CollisionBox());
-    return boxes.back();
+    auto box = new CollisionBox();
+    boxes.push_back(box);
+    return box;
 }
 
 void CollisionManager::destroy_collision_box(CollisionBox *box)
@@ -36,33 +37,7 @@ CollisionManager::~CollisionManager()
 void CollisionManager::process_collide()
 {
     for (auto src_box : boxes)
-    {
-        if (!src_box->get_enable())
-            continue;
-
-        if (src_box->get_src() == CollisionLayer::None || src_box->get_dst().empty())
-            continue;
-
-        for (auto dst_box : boxes)
-        {
-            if ((&src_box == &dst_box) || (!src_box->has_dst(dst_box->get_src())))
-                continue;
-
-            puts("?!");
-
-            if (!dst_box->get_enable())
-                continue;
-
-            if (dst_box->get_src() == CollisionLayer::None)
-                continue;
-
-            if (dst_box->collide_callback && dst_box->m_rect.is_intersect(src_box->m_rect))
-            {
-                std::cout << "Hit!" << std::endl;
-                dst_box->collide_callback(*src_box);
-            }
-        }
-    }
+        src_box->process_collide();
 }
 
 void CollisionManager::debug_render(SDL_Renderer *renderer) const

@@ -35,48 +35,23 @@ private:
     CLASS_POINTER(Object, object)
 
 private:
-    CollisionBox()
-        : m_object(nullptr)
-    {
-    }
+    CollisionBox();
 
 public:
     ~CollisionBox() = default;
     CollisionBox(const CollisionBox &) = delete;
     CollisionBox &operator=(const CollisionBox &) = delete;
 
-    CollisionBox(CollisionBox &&other) noexcept
-        : collide_callback(std::move(other.collide_callback)),
-          m_enable(other.m_enable),
-          m_src(other.m_src),
-          m_dst(std::move(other.m_dst)),
-          m_rect(std::move(other.m_rect)),
-          m_object(other.m_object)
-    {
-        other.m_src = CollisionLayer::None;
-        other.m_dst.clear();
-        other.m_object = nullptr;
-    }
+    CollisionBox(CollisionBox &&) noexcept;
 
-    CollisionBox &operator=(CollisionBox &&other) noexcept
-    {
-        if (this == &other)
-            return *this;
-
-        collide_callback = std::move(other.collide_callback);
-        m_enable = other.m_enable;
-        m_src = other.m_src, other.m_src = CollisionLayer::None;
-        m_dst = std::move(other.m_dst), other.m_dst.clear();
-        m_rect = std::move(other.m_rect);
-        m_object = other.m_object, other.m_object = nullptr;
-
-        return *this;
-    }
+    CollisionBox &operator=(CollisionBox &&) noexcept;
 
 public:
     void on_collide(Callback &&callback) { collide_callback = std::move(callback); }
 
     void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
+
+    void process_collide();
 
     Set<CollisionLayer> &get_dst() { return m_dst; }
     const Set<CollisionLayer> &get_dst() const { return m_dst; }
