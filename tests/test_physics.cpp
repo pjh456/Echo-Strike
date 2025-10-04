@@ -16,16 +16,15 @@ int main()
     auto window = SDL_CreateWindow("Collision Test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
 
-    std::vector<PhysicaObject *> particles;
-    std::vector<PhysicaObject *> del_particles;
+    std::vector<PhysicalObject *> particles;
+    std::vector<PhysicalObject *> del_particles;
 
-    // 随机速度生成器
     std::mt19937 rng(std::random_device{}());
     std::uniform_real_distribution<float> speed_dist(100.0f, 300.0f);
 
-    // 创建墙壁（四个静态物体）
     std::vector<ObstacleObject *> walls;
     Rect boundary(0, 0, 800, 600);
+    Vec2 gravity(0, 1000);
 
     auto make_wall = [&](float x, float y, float w, float h)
     {
@@ -37,7 +36,7 @@ int main()
 
     make_wall(0, 0, 800, 10);   // top
     make_wall(0, 590, 800, 10); // bottom
-    make_wall(390, 0, 10, 600); // center
+    // make_wall(390, 0, 10, 600); // center
     make_wall(0, 0, 10, 600);   // left
     make_wall(790, 0, 10, 600); // right
 
@@ -57,7 +56,6 @@ int main()
                 running = false;
             else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN)
             {
-                // 点击后发射一个小方块
                 float mouse_x = static_cast<float>(event.button.x);
                 float mouse_y = static_cast<float>(event.button.y);
 
@@ -67,10 +65,10 @@ int main()
                 float speed_val = speed_dist(rng);
                 Vec2 velocity(dir.get_x() * speed_val, dir.get_y() * speed_val);
 
-                auto *p = new PhysicaObject();
+                auto *p = new PhysicalObject();
                 p->set_rect(Rect(10, 10, 25, 25));
                 p->set_speed(velocity);
-                p->set_force(Vec2(0, 0));
+                p->set_force(gravity);
                 p->set_mess(1.0f);
                 particles.push_back(p);
 
@@ -82,13 +80,10 @@ int main()
             }
         }
 
-        // 更新所有动态物体
         for (auto *p : particles)
         {
             if (p->get_rect().is_intersect(boundary))
-            {
                 p->on_update(delta);
-            }
             else
                 del_particles.push_back(p);
         }
@@ -101,8 +96,7 @@ int main()
         }
         del_particles.clear();
 
-        // 调用碰撞检测
-        CollisionManager::instance().process_collide();
+        // CollisionManager::instance().process_collide();
 
         // 绘制
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -121,7 +115,6 @@ int main()
         SDL_Delay(16);
     }
 
-    // 清理
     for (auto *p : particles)
         delete p;
     for (auto *w : walls)

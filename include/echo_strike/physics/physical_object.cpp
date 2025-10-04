@@ -67,6 +67,8 @@ void PhysicalObject::handle_collide_obstacle(ObstacleObject &other)
             box_rect.set_y(box_rect.get_y() + overlap_y);
         set_speed(Vec2(m_speed.get_x(), -m_speed.get_y()));
     }
+
+    set_speed(get_speed() * 0.9);
 }
 
 void PhysicalObject::handle_collide_object(PhysicalObject &other)
