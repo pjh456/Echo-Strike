@@ -36,13 +36,15 @@ CollisionBox &CollisionBox::operator=(CollisionBox &&other) noexcept
     return *this;
 }
 
-void CollisionBox::process_collide()
+std::vector<CollisionBox *> CollisionBox::process_collide() const
 {
+    std::vector<CollisionBox *> result;
+
     if (!get_enable())
-        return;
+        return result;
 
     if (m_src == CollisionLayer::None || m_dst.empty())
-        return;
+        return result;
 
     for (auto dst_box : CollisionManager::instance().collision_boxes())
     {
@@ -55,7 +57,7 @@ void CollisionBox::process_collide()
         if (dst_box->get_src() == CollisionLayer::None)
             continue;
 
-        if (dst_box->collide_callback && dst_box->m_rect.is_intersect(m_rect))
-            dst_box->collide_callback(*this);
+        if (dst_box->m_rect.is_intersect(m_rect))
+            result.push_back(dst_box);
     }
 }

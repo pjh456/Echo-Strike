@@ -37,7 +37,14 @@ CollisionManager::~CollisionManager()
 void CollisionManager::process_collide()
 {
     for (auto src_box : boxes)
-        src_box->process_collide();
+    {
+        auto dst_boxes = src_box->process_collide();
+        for (auto dst_box : dst_boxes)
+        {
+            if (dst_box->collide_callback)
+                dst_box->collide_callback(*src_box);
+        }
+    }
 }
 
 void CollisionManager::debug_render(SDL_Renderer *renderer) const

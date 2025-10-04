@@ -51,7 +51,7 @@ public:
 
     void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
 
-    void process_collide();
+    std::vector<CollisionBox *> process_collide() const;
 
     Set<CollisionLayer> &get_dst() { return m_dst; }
     const Set<CollisionLayer> &get_dst() const { return m_dst; }
