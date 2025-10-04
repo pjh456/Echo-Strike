@@ -33,6 +33,8 @@ public:
     Vec2 &operator*=(float);
     Vec2 &operator/=(float);
 
+    bool operator==(const Vec2 &) const;
+
 public:
     float length() const;
     Vec2 normalize() const;

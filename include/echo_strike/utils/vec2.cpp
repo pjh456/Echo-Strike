@@ -75,6 +75,11 @@ Vec2 &Vec2::operator/=(float ratio)
     return *this;
 }
 
+bool Vec2::operator=(const Vec2 &other) const
+{
+    return m_x == other.m_x && m_y == other.m_y;
+}
+
 float Vec2::length() const
 {
     return std::sqrt((m_x * m_x) + (m_y * m_y));
