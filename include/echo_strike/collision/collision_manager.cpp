@@ -12,7 +12,7 @@ CollisionBox &CollisionManager::create_collision_box()
 {
     CollisionBox temp;
     boxes.push_back(temp);
-    return boxes.back();
+    return boxes[boxes.size() - 1];
 }
 
 void CollisionManager::destroy_collision_box(CollisionBox &box)
@@ -37,6 +37,9 @@ void CollisionManager::process_collide()
 
         for (auto &dst_box : boxes)
         {
+            if ((&src_box == &dst_box) || (!src_box.has_dst(dst_box.get_src())))
+                break;
+
             if (!dst_box.get_enable())
                 continue;
 

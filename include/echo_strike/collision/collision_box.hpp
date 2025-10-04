@@ -9,6 +9,7 @@
 #include <SDL3/SDL.h>
 
 #include <functional>
+#include <unordered_set>
 
 class CollisionManager;
 class Object;
@@ -19,16 +20,19 @@ class CollisionBox
 
 public:
     using Callback = std::function<void(CollisionBox &)>;
+    template <typename T>
+    using Set = std::unordered_set<T>;
 
 private:
     Callback collide_callback;
 
-    CLASS_PROPERTY(bool, enable);
+    Set<CollisionLayer> m_dst;
+
+    CLASS_PROPERTY(bool, enable)
     CLASS_PROPERTY(Rect, rect)
     CLASS_PROPERTY(CollisionLayer, src)
-    CLASS_PROPERTY(CollisionLayer, dst)
 
-    CLASS_POINTER(Object, object);
+    CLASS_POINTER(Object, object)
 
 private:
     CollisionBox() = default;
@@ -43,6 +47,12 @@ public:
     void on_collide(Callback &&callback) { collide_callback = std::move(callback); }
 
     void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
+
+    Set<CollisionLayer> &get_dst() { return m_dst; }
+    const Set<CollisionLayer> &get_dst() const { return m_dst; }
+    void add_dst(CollisionLayer p_dst) { m_dst.insert(p_dst); }
+    bool has_dst(CollisionLayer p_dst) const { return m_dst.count(p_dst); }
+    void remove_dst(CollisionLayer p_dst) { m_dst.erase(p_dst); }
 };
 
 #endif // INCLUDE_COLLISION_BOX
