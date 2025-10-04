@@ -26,7 +26,7 @@ public:
     virtual void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
     virtual void render_full(SDL_Renderer *renderer) const { m_rect.render_full(renderer); }
 
-    virtual void on_update(float delta)
+    void on_update(float delta)
     {
         float delta_pos_x = delta * m_speed.get_x();
         float delta_pos_y = delta * m_speed.get_y();
