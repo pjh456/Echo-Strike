@@ -44,26 +44,26 @@ SDL_FRect Rect::to_frect() const
 
 bool Rect::is_inside(const Vec2 &pos) const
 {
-    if (left() >= pos.get_x())
+    if (left() <= pos.get_x())
         return false;
-    if (right() <= pos.get_x())
+    if (right() >= pos.get_x())
         return false;
-    if (up() <= pos.get_y())
+    if (up() >= pos.get_y())
         return false;
-    if (down() >= pos.get_y())
+    if (down() <= pos.get_y())
         return false;
     return true;
 }
 
 bool Rect::is_inside(const Rect &rect) const
 {
-    if (left() >= rect.left())
+    if (left() <= rect.left())
         return false;
-    if (right() <= rect.right())
+    if (right() >= rect.right())
         return false;
-    if (up() <= rect.up())
+    if (up() >= rect.up())
         return false;
-    if (down() >= rect.down())
+    if (down() <= rect.down())
         return false;
     return true;
 }
