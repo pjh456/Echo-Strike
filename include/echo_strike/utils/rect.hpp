@@ -52,6 +52,22 @@ public:
 
     void render_border(SDL_Renderer *) const;
     void render_full(SDL_Renderer *) const;
+
+public:
+    Rect &operator+=(const Vec2 &);
+    Rect operator+(const Vec2 &) const;
+
+    Rect &operator-=(const Vec2 &);
+    Rect operator-(const Vec2 &) const;
+
+    Rect &operator*=(const Vec2 &);
+    Rect operator*(const Vec2 &) const;
+
+    Rect &operator/=(const Vec2 &);
+    Rect operator/(const Vec2 &) const;
+
+public:
+    float time_to_collide(const Vec2 &, const Rect &) const;
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Rect &rect)

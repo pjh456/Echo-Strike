@@ -44,13 +44,13 @@ SDL_FRect Rect::to_frect() const
 
 bool Rect::is_inside(const Vec2 &pos) const
 {
-    if (left() <= pos.get_x())
+    if (left() >= pos.get_x())
         return false;
-    if (right() >= pos.get_x())
+    if (right() <= pos.get_x())
         return false;
-    if (up() >= pos.get_y())
+    if (up() <= pos.get_y())
         return false;
-    if (down() <= pos.get_y())
+    if (down() >= pos.get_y())
         return false;
     return true;
 }
@@ -126,4 +126,94 @@ void Rect::render_full(SDL_Renderer *renderer) const
 
     SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
     SDL_RenderFillRect(renderer, &rect);
+}
+
+Rect &Rect::operator+=(const Vec2 &delta)
+{
+    m_x += delta.get_x();
+    m_y += delta.get_y();
+    return *this;
+}
+Rect Rect::operator+(const Vec2 &delta) const { return Rect(*this).operator+=(delta); }
+
+Rect &Rect::operator-=(const Vec2 &delta)
+{
+    m_x -= delta.get_x();
+    m_y -= delta.get_y();
+    return *this;
+}
+Rect Rect::operator-(const Vec2 &delta) const { return Rect(*this).operator-=(delta); }
+
+Rect &Rect::operator*=(const Vec2 &ratio)
+{
+    m_width *= ratio.get_x();
+    m_height *= ratio.get_y();
+    return *this;
+}
+Rect Rect::operator*(const Vec2 &ratio) const { return Rect(*this).operator*=(ratio); }
+
+Rect &Rect::operator/=(const Vec2 &ratio)
+{
+    m_width = ratio.get_x() == 0 ? 0 : m_width / ratio.get_x();
+    m_height = ratio.get_y() == 0 ? 0 : m_height / ratio.get_y();
+    return *this;
+}
+Rect Rect::operator/(const Vec2 &ratio) const { return Rect(*this).operator/=(ratio); }
+
+float Rect::time_to_collide(const Vec2 &velocity, const Rect &target) const
+{
+    Vec2 enter_time, exit_time;
+
+    float vx = velocity.get_x();
+    float vy = velocity.get_y();
+
+    if (vx > 0)
+    {
+        enter_time.set_x((target.left() - right()) / vx);
+        exit_time.set_x((target.right() - left()) / vx);
+    }
+    else if (vx < 0)
+    {
+        enter_time.set_x((target.right() - left()) / vx);
+        exit_time.set_x((target.left() - right()) / vx);
+    }
+    else
+    {
+        if (right() < target.left() || left() > target.right())
+            return -1;
+        else
+        {
+            enter_time.set_x(-std::numeric_limits<float>::infinity());
+            exit_time.set_x(+std::numeric_limits<float>::infinity());
+        }
+    }
+
+    if (vy > 0)
+    {
+        enter_time.set_y((target.down() - up()) / vy);
+        exit_time.set_y((target.up() - down()) / vy);
+    }
+    else if (vy < 0)
+    {
+        enter_time.set_y((target.up() - down()) / vy);
+        exit_time.set_y((target.down() - up()) / vy);
+    }
+    else
+    {
+        if (up() < target.down() || down() > target.up())
+            return -1;
+        else
+        {
+            enter_time.set_y(-std::numeric_limits<float>::infinity());
+            exit_time.set_y(std::numeric_limits<float>::infinity());
+        }
+    }
+
+    float t_enter = std::max(enter_time.get_x(), enter_time.get_y());
+    float t_exit = std::min(exit_time.get_x(), exit_time.get_y());
+
+    if (t_enter > t_exit || t_exit < 0)
+        return -1.0f; // 不会碰撞
+
+    return std::max(0.0f, t_enter); // 碰撞时间
 }
