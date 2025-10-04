@@ -41,6 +41,9 @@ public:
     float down() const { return m_y; }
 
 public:
+    bool is_strictly_inside(const Vec2 &) const;
+    bool is_strictly_inside(const Rect &) const;
+
     bool is_inside(const Vec2 &) const;
     bool is_inside(const Rect &) const;
 
