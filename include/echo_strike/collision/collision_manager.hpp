@@ -1,6 +1,7 @@
 #ifndef INCLUDE_COLLISION_MANAGER
 #define INCLUDE_COLLISION_MANAGER
 
+#include <echo_strike/utils/quadtree.hpp>
 #include <echo_strike/collision/collision_box.hpp>
 
 #include <SDL3/SDL.h>
@@ -18,9 +19,10 @@ public:
 
 private:
     std::vector<CollisionBox *> boxes;
+    QuadTree<CollisionBox> m_quad_tree;
 
 private:
-    CollisionManager() = default;
+    CollisionManager();
     ~CollisionManager();
 
 public:
@@ -29,6 +31,9 @@ public:
 
     std::vector<CollisionBox *> &collision_boxes() { return boxes; }
     const std::vector<CollisionBox *> &collision_boxes() const { return boxes; }
+
+    QuadTree<CollisionBox> &quad_tree() { return m_quad_tree; }
+    const QuadTree<CollisionBox> &quad_tree() const { return m_quad_tree; }
 
     void process_collide();
 };

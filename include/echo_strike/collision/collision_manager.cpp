@@ -4,6 +4,11 @@
 #include <iostream>
 #include <utility>
 
+CollisionManager::CollisionManager()
+    : m_quad_tree(Rect(0, 0, 800, 600))
+{
+}
+
 CollisionManager &CollisionManager::instance()
 {
     static CollisionManager manager;
@@ -14,6 +19,7 @@ CollisionBox *CollisionManager::create_collision_box()
 {
     auto box = new CollisionBox();
     boxes.push_back(box);
+    m_quad_tree.insert(Rect{}, box);
     return box;
 }
 
@@ -25,6 +31,7 @@ void CollisionManager::destroy_collision_box(CollisionBox *box)
             boxes.end(),
             box));
 
+    m_quad_tree.remove(box->get_rect(), box);
     delete box;
 }
 

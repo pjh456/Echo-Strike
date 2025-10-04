@@ -46,7 +46,10 @@ std::vector<CollisionBox *> CollisionBox::process_collide() const
     if (m_src == CollisionLayer::None || m_dst.empty())
         return result;
 
-    for (auto dst_box : CollisionManager::instance().collision_boxes())
+    auto collide_result = CollisionManager::instance().quad_tree().query(m_rect);
+    result.reserve(collide_result.size());
+
+    for (auto dst_box : collide_result)
     {
         if ((this == dst_box) || (!has_dst(dst_box->get_src())))
             continue;
@@ -57,9 +60,14 @@ std::vector<CollisionBox *> CollisionBox::process_collide() const
         if (dst_box->get_src() == CollisionLayer::None)
             continue;
 
-        if (dst_box->m_rect.is_intersect(m_rect))
-            result.push_back(dst_box);
+        result.push_back(dst_box);
     }
 
     return result;
+}
+
+void CollisionBox::set_rect(const Rect &rect)
+{
+    CollisionManager::instance().quad_tree().update(m_rect, rect, this);
+    m_rect = rect;
 }

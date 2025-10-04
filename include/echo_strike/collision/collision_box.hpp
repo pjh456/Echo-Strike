@@ -27,9 +27,10 @@ private:
     Callback collide_callback;
 
     Set<CollisionLayer> m_dst;
+    Rect m_rect;
 
     CLASS_PROPERTY(bool, enable)
-    CLASS_PROPERTY(Rect, rect)
+
     CLASS_PROPERTY(CollisionLayer, src)
 
     CLASS_POINTER(Object, object)
@@ -54,11 +55,15 @@ public:
 
     std::vector<CollisionBox *> process_collide() const;
 
+public:
     Set<CollisionLayer> &get_dst() { return m_dst; }
     const Set<CollisionLayer> &get_dst() const { return m_dst; }
     void add_dst(CollisionLayer p_dst) { m_dst.insert(p_dst); }
     bool has_dst(CollisionLayer p_dst) const { return m_dst.count(p_dst); }
     void remove_dst(CollisionLayer p_dst) { m_dst.erase(p_dst); }
+
+    Rect get_rect() const { return m_rect; }
+    void set_rect(const Rect &rect);
 };
 
 #endif // INCLUDE_COLLISION_BOX
