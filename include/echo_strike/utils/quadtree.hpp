@@ -149,11 +149,8 @@ private:
             return nullptr;
         }
 
-        bool remove(const Rect &rect, T *val)
+        bool remove(T *val)
         {
-            if (!boundary.is_intersect(rect))
-                return false;
-
             for (auto it = values.begin(); it != values.end(); ++it)
             {
                 if (it->value == val)
@@ -164,8 +161,10 @@ private:
             }
 
             for (int idx = 0; idx < 4; ++idx)
-                if (child[idx] != nullptr && child[idx]->remove(rect, val))
+            {
+                if (child[idx] != nullptr && child[idx]->remove(val))
                     return true;
+            }
 
             return false;
         }
@@ -240,11 +239,11 @@ public:
     Storage *find(const Rect &rect, T *val) { return root->find(rect, val); }
     const Storage *find(const Rect &rect, T *val) const { return root->find(rect, val); }
 
-    bool remove(const Rect &rect, T *val) { return root->remove(rect, val); }
+    bool remove(T *val) { return root->remove(val); }
 
-    void update(const Rect &old_rect, const Rect &new_rect, T *val)
+    void update(const Rect &new_rect, T *val)
     {
-        if (remove(old_rect, val))
+        if (remove(val))
             insert(new_rect, val);
     }
 };

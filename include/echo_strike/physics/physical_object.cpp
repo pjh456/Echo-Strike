@@ -31,17 +31,60 @@ PhysicalObject::~PhysicalObject()
 
 void PhysicalObject::on_update(float delta)
 {
+    if (delta <= 1e-6)
+        return;
+
     auto origin_rect = m_rect;
     auto origin_speed = m_speed;
 
-    // try to update
     Object::on_update(delta);
 
-    auto top_left_motion_ray = Ray();
+    // 原始矩形角点
+    auto tl0 = origin_rect.top_left();
+    auto tr0 = origin_rect.top_right();
+    auto bl0 = origin_rect.bottom_left();
+    auto br0 = origin_rect.bottom_right();
 
+    // 更新后矩形角点
+    auto tl1 = m_rect.top_left();
+    auto tr1 = m_rect.top_right();
+    auto bl1 = m_rect.bottom_left();
+    auto br1 = m_rect.bottom_right();
+
+    // 计算 motion AABB
+    float
+        min_x =
+            std::min({tl0.get_x(), tr0.get_x(), bl0.get_x(), br0.get_x(),
+                      tl1.get_x(), tr1.get_x(), bl1.get_x(), br1.get_x()}),
+        max_x =
+            std::max({tl0.get_x(), tr0.get_x(), bl0.get_x(), br0.get_x(),
+                      tl1.get_x(), tr1.get_x(), bl1.get_x(), br1.get_x()}),
+        min_y =
+            std::min({tl0.get_y(), tr0.get_y(), bl0.get_y(), br0.get_y(),
+                      tl1.get_y(), tr1.get_y(), bl1.get_y(), br1.get_y()}),
+        max_y =
+            std::max({tl0.get_y(), tr0.get_y(), bl0.get_y(), br0.get_y(),
+                      tl1.get_y(), tr1.get_y(), bl1.get_y(), br1.get_y()});
+
+    // motion 包围盒
+    Rect motion_aabb(min_x, min_y, max_x - min_x, max_y - min_y);
+
+    box.set_rect(motion_aabb);
+    auto motion_boxes = box.process_collide();
     box.set_rect(m_rect);
 
-    auto dst_boxes = box.process_collide();
+    if (motion_boxes.empty())
+        return;
+
+    std::vector<CollisionBox *> dst_boxes;
+    dst_boxes.reserve(motion_boxes.size());
+
+    for (auto motion_box : motion_boxes)
+    {
+        if (m_rect.is_intersect(motion_box->get_rect()))
+            dst_boxes.push_back(motion_box);
+    }
+
     if (dst_boxes.empty())
         return;
 
@@ -58,13 +101,9 @@ void PhysicalObject::on_update(float delta)
         }
     }
 
-    if (first_collide_time > delta || is_collided)
-    {
-        is_collided = false;
+    if (first_collide_time >= delta - 1e-6f)
         return;
-    }
 
-    is_collided = true;
     m_rect = origin_rect, m_speed = origin_speed;
     Object::on_update(first_collide_time);
     box.get_callback()(*first_collide_box);

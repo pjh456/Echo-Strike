@@ -31,7 +31,7 @@ void CollisionManager::destroy_collision_box(CollisionBox *box)
             boxes.end(),
             box));
 
-    m_quad_tree.remove(box->get_rect(), box);
+    m_quad_tree.remove(box);
     delete box;
 }
 

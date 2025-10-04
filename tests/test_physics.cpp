@@ -66,7 +66,7 @@ int main()
                 Vec2 velocity(dir.get_x() * speed_val, dir.get_y() * speed_val);
 
                 auto *p = new PhysicalObject();
-                p->set_rect(Rect(10, 10, 25, 25));
+                p->set_rect(Rect(30, 30, 25, 25));
                 p->set_speed(velocity);
                 p->set_force(gravity);
                 p->set_mess(1.0f);

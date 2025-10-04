@@ -15,7 +15,6 @@ class PhysicalObject : public Object
 private:
     CollisionBox &box;
     CLASS_PROPERTY(float, mess);
-    bool is_collided = false;
 
 public:
     PhysicalObject();
