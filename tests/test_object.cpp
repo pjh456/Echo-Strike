@@ -3,7 +3,7 @@
 #include <random>
 #include <cmath>
 
-#include <echo_strike/physics/particle.hpp>
+#include <echo_strike/physics/object.hpp>
 
 int main()
 {
@@ -12,7 +12,7 @@ int main()
     auto window = SDL_CreateWindow("Collision Test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
 
-    std::vector<Particle> particles;
+    std::vector<Object> particles;
 
     bool running = true;
     SDL_Event event;
@@ -42,7 +42,7 @@ int main()
                 float speed_val = speed_dist(rng);
                 Vec2 velocity(dir.get_x() * speed_val, dir.get_y() * speed_val);
 
-                Particle p;
+                Object p;
                 p.set_rect(Rect(0, 0, 25, 25));
                 p.set_speed(velocity);
                 p.set_force(Vec2(0, 0));

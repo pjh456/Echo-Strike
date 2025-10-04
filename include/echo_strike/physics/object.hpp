@@ -1,5 +1,5 @@
-#ifndef INCLUDE_PARTICLE
-#define INCLUDE_PARTICLE
+#ifndef INCLUDE_OBJECT
+#define INCLUDE_OBJECT
 
 #include <echo_strike/utils/class_marcos.hpp>
 #include <echo_strike/utils/vec2.hpp>
@@ -7,26 +7,26 @@
 
 #include <SDL3/SDL.h>
 
-class Particle
+class Object
 {
-private:
+protected:
     CLASS_PROPERTY(Rect, rect)
     CLASS_PROPERTY(Vec2, speed)
     CLASS_PROPERTY(Vec2, force)
 
 public:
-    Particle() = default;
-    ~Particle() = default;
+    Object() = default;
+    virtual ~Object() = default;
 
 public:
-    void add_speed(const Vec2 &speed) { m_speed += speed; }
-    void add_force(const Vec2 &force) { m_force += force; }
+    virtual void add_speed(const Vec2 &speed) { m_speed += speed; }
+    virtual void add_force(const Vec2 &force) { m_force += force; }
 
 public:
-    void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
-    void render_full(SDL_Renderer *renderer) const { m_rect.render_full(renderer); }
+    virtual void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
+    virtual void render_full(SDL_Renderer *renderer) const { m_rect.render_full(renderer); }
 
-    void on_update(float delta)
+    virtual void on_update(float delta)
     {
         float delta_pos_x = delta * m_speed.get_x();
         float delta_pos_y = delta * m_speed.get_y();
@@ -40,4 +40,4 @@ public:
     }
 };
 
-#endif // INCLUDE_PARTICLE
+#endif // INCLUDE_OBJECT
