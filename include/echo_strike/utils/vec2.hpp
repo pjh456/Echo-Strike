@@ -41,6 +41,10 @@ public:
     float manhattan_dis(const Vec2 &) const;
 };
 
+inline Vec2 operator*(float ratio, const Vec2 &vec2) { return vec2.operator*(ratio); }
+
+inline Vec2 operator/(float ratio, const Vec2 &vec2) { return vec2.operator/(ratio); }
+
 inline std::ostream &operator<<(std::ostream &os, const Vec2 &vec2)
 {
     os << "Vec2(" << vec2.get_x() << ", " << vec2.get_y() << ")";
