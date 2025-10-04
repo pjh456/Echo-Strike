@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <utility>
 
 CollisionManager &CollisionManager::instance()
 {
@@ -12,7 +13,7 @@ CollisionManager &CollisionManager::instance()
 CollisionBox *CollisionManager::create_collision_box()
 {
     CollisionBox temp;
-    boxes.push_back(temp);
+    boxes.push_back(std::move(temp));
     return &boxes.back();
 }
 
