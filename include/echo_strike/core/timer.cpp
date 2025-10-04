@@ -37,6 +37,8 @@ Timer &Timer::operator=(Timer &&other) noexcept
     m_shotted = other.m_shotted;
     m_one_shot = other.m_one_shot;
     timeout_callback = std::move(other.timeout_callback);
+
+    return *this;
 }
 
 void Timer::restart() { m_pass_time = 0, m_paused = false; }
