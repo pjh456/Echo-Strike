@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-class PhysicaObject : public Object
+class PhysicalObject : public Object
 {
 private:
     CollisionBox &box;
@@ -18,9 +18,9 @@ private:
     bool is_collided = false;
 
 public:
-    PhysicaObject();
+    PhysicalObject();
 
-    ~PhysicaObject();
+    ~PhysicalObject();
 
 public:
     void on_update(float delta)
@@ -63,6 +63,10 @@ public:
 public:
     CollisionBox &collision_box() { return box; }
     const CollisionBox &collision_box() const { return box; }
+
+private:
+    void handle_collide_obstacle(ObstacleObject &);
+    void handle_collide_object(PhysicalObject &);
 };
 
 #endif // INCLUDE_PHYSICAL_OBJECT
