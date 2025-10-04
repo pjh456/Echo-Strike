@@ -15,7 +15,7 @@ public:
     Entity *create_entity()
     {
         auto collision_box = CollisionManager::instance().create_collision_box();
-        return static_cast<Entity *>(new T(collision_box));
+        return static_cast<Entity *>(new T(*collision_box));
     }
 
     void destroy_entity(Entity *);

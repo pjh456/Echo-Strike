@@ -14,7 +14,7 @@ void EntityManager::destroy_entity(Entity *entity)
         return;
 
     auto hit_box = entity->get_hit_box();
-    CollisionManager::instance().destroy_collision_box(*hit_box);
+    CollisionManager::instance().destroy_collision_box(hit_box);
 
     entities.erase(std::find_if(
         entities.begin(),
