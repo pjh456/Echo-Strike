@@ -14,14 +14,14 @@ int main()
     auto renderer = SDL_CreateRenderer(window, NULL);
 
     CollisionManager manager;
-    auto &box1 = manager.create_collision_box();
+    auto &box1 = *manager.create_collision_box();
     box1.set_rect(Rect{100, 100, 200, 200});
     box1.set_enable(true);
     box1.on_collide(
         [](CollisionBox &)
         { std::cout << "Box 1 collided!\n"; });
 
-    auto &box2 = manager.create_collision_box();
+    auto &box2 = *manager.create_collision_box();
     box2.set_rect(Rect{250, 150, 200, 200});
     box2.set_enable(true);
     box2.on_collide(

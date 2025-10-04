@@ -11,8 +11,8 @@ class CollisionManager
 {
 public:
     static CollisionManager &instance();
-    CollisionBox &create_collision_box();
-    void destroy_collision_box(CollisionBox &);
+    CollisionBox *create_collision_box();
+    void destroy_collision_box(CollisionBox *);
 
     void debug_render(SDL_Renderer *) const;
 
