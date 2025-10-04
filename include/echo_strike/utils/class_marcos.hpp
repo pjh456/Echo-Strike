@@ -2,7 +2,7 @@
 #define INCLUDE_CLASS_MARCOS
 
 #define CLASS_READONLY_PROPERTY(type, name) \
-private:                                    \
+protected:                                  \
     type m_##name;                          \
                                             \
 public:                                     \
@@ -13,7 +13,7 @@ public:                                     \
     void set_##name(const type &p_##name) noexcept { m_##name = p_##name; }
 
 #define CLASS_POINTER(type, name)                          \
-private:                                                   \
+protected:                                                 \
     type *m_##name;                                        \
                                                            \
 public:                                                    \
@@ -26,7 +26,7 @@ public:                                                    \
     }
 
 #define CLASS_REFERENCE(type, name)                  \
-private:                                             \
+protected:                                           \
     type &m_##name;                                  \
                                                      \
 public:                                              \
