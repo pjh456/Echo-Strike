@@ -75,7 +75,7 @@ Vec2 &Vec2::operator/=(float ratio)
     return *this;
 }
 
-bool Vec2::operator=(const Vec2 &other) const
+bool Vec2::operator==(const Vec2 &other) const
 {
     return m_x == other.m_x && m_y == other.m_y;
 }
@@ -105,4 +105,9 @@ float Vec2::manhattan_dis(const Vec2 &other) const
     float delta_x = m_x - other.m_x;
     float delta_y = m_y - other.m_y;
     return std::abs(delta_x) + std::abs(delta_y);
+}
+
+float Vec2::cross(const Vec2 &other) const
+{
+    return m_x * other.m_y - m_y * other.m_x;
 }
