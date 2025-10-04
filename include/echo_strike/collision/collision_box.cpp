@@ -60,4 +60,6 @@ std::vector<CollisionBox *> CollisionBox::process_collide() const
         if (dst_box->m_rect.is_intersect(m_rect))
             result.push_back(dst_box);
     }
+
+    return result;
 }
