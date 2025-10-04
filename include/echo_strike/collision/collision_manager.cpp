@@ -44,7 +44,7 @@ void CollisionManager::process_collide()
                 continue;
 
             if (dst_box.collide_callback && dst_box.m_rect.is_intersect(src_box.m_rect))
-                dst_box.collide_callback(src_box.m_entity);
+                dst_box.collide_callback(src_box);
         }
     }
 }

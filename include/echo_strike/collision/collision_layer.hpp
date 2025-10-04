@@ -6,7 +6,8 @@ enum class CollisionLayer
     None,
     Player,
     Enemy,
-    Obstacle
+    Building,
+    Physics
 };
 
 #endif // INCLUDE_COLLISION_LAYER

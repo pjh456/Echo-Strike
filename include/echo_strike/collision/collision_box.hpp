@@ -11,14 +11,14 @@
 #include <functional>
 
 class CollisionManager;
-class Entity;
+class Object;
 
 class CollisionBox
 {
     friend class CollisionManager;
 
 public:
-    using Callback = std::function<void(Entity *)>;
+    using Callback = std::function<void(CollisionBox &)>;
 
 private:
     Callback collide_callback;
@@ -28,7 +28,7 @@ private:
     CLASS_PROPERTY(CollisionLayer, src)
     CLASS_PROPERTY(CollisionLayer, dst)
 
-    CLASS_POINTER(Entity, entity);
+    CLASS_POINTER(Object, object);
 
 private:
     CollisionBox() = default;
