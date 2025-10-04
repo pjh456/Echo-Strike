@@ -3,6 +3,8 @@
 
 #include <echo_strike/utils/class_marcos.hpp>
 
+#include <echo_strike/physics/object.hpp>
+
 #include <echo_strike/entity/status.hpp>
 #include <echo_strike/entity/entity_state.hpp>
 
@@ -14,7 +16,7 @@ class CollisionBox;
 
 class EntityManager;
 
-class Entity
+class Entity : public Object
 {
     friend class EntityManager;
 
