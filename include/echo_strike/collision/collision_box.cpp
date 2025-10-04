@@ -68,6 +68,7 @@ std::vector<CollisionBox *> CollisionBox::process_collide() const
 
 void CollisionBox::set_rect(const Rect &rect)
 {
+    // CollisionManager::instance().quad_tree().update(m_rect, rect, this);
     CollisionManager::instance().quad_tree().update(rect, this);
     m_rect = rect;
 }

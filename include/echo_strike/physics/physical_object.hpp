@@ -15,6 +15,7 @@ class PhysicalObject : public Object
 private:
     CollisionBox &box;
     CLASS_PROPERTY(float, mess);
+    bool is_collided = false;
 
 public:
     PhysicalObject();
@@ -29,6 +30,7 @@ public:
     const CollisionBox &collision_box() const { return box; }
 
 private:
+    void update_recursive(float);
     void handle_collide_obstacle(ObstacleObject &);
     void handle_collide_object(PhysicalObject &);
 };

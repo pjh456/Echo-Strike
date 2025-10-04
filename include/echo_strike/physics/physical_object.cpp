@@ -31,83 +31,100 @@ PhysicalObject::~PhysicalObject()
 
 void PhysicalObject::on_update(float delta)
 {
+    is_collided = false;
+    update_recursive(delta);
+}
+
+void PhysicalObject::update_recursive(float delta)
+{
     if (delta <= 1e-6)
         return;
 
+    // 1. Record the origin value
     auto origin_rect = m_rect;
     auto origin_speed = m_speed;
 
+    // 2. Try to update totally
     Object::on_update(delta);
 
-    // 原始矩形角点
-    auto tl0 = origin_rect.top_left();
-    auto tr0 = origin_rect.top_right();
-    auto bl0 = origin_rect.bottom_left();
-    auto br0 = origin_rect.bottom_right();
+    // 3. Save the preview value and load the origin one
+    auto future_rect = m_rect;
+    auto future_speed = m_speed;
+    m_rect = origin_rect;
+    m_speed = origin_speed;
 
-    // 更新后矩形角点
-    auto tl1 = m_rect.top_left();
-    auto tr1 = m_rect.top_right();
-    auto bl1 = m_rect.bottom_left();
-    auto br1 = m_rect.bottom_right();
+    // 4. Define the motion rays
+    auto
+        top_left_ray = Ray(origin_rect.top_left(), future_rect.top_left()),
+        top_right_ray = Ray(origin_rect.top_right(), future_rect.top_right()),
+        bottom_left_ray = Ray(origin_rect.bottom_left(), future_rect.bottom_left()),
+        bottom_right_ray = Ray(origin_rect.bottom_right(), future_rect.bottom_right());
 
-    // 计算 motion AABB
-    float
-        min_x =
-            std::min({tl0.get_x(), tr0.get_x(), bl0.get_x(), br0.get_x(),
-                      tl1.get_x(), tr1.get_x(), bl1.get_x(), br1.get_x()}),
-        max_x =
-            std::max({tl0.get_x(), tr0.get_x(), bl0.get_x(), br0.get_x(),
-                      tl1.get_x(), tr1.get_x(), bl1.get_x(), br1.get_x()}),
-        min_y =
-            std::min({tl0.get_y(), tr0.get_y(), bl0.get_y(), br0.get_y(),
-                      tl1.get_y(), tr1.get_y(), bl1.get_y(), br1.get_y()}),
-        max_y =
-            std::max({tl0.get_y(), tr0.get_y(), bl0.get_y(), br0.get_y(),
-                      tl1.get_y(), tr1.get_y(), bl1.get_y(), br1.get_y()});
+    // 4. Calculate the motion rect
+    auto
+        min_x = std::min(origin_rect.left(), future_rect.left()),
+        min_y = std::min(origin_rect.bottom(), future_rect.bottom()),
+        max_x = std::max(origin_rect.right(), future_rect.right()),
+        max_y = std::max(origin_rect.top(), future_rect.top());
+    auto motion_aabb = Rect(min_x, min_y, max_x - min_x, max_y - min_y);
 
-    // motion 包围盒
-    Rect motion_aabb(min_x, min_y, max_x - min_x, max_y - min_y);
-
+    // 5. Try to get potential collisions
     box.set_rect(motion_aabb);
-    auto motion_boxes = box.process_collide();
+    auto potential_collisions = box.process_collide();
     box.set_rect(m_rect);
 
-    if (motion_boxes.empty())
-        return;
-
-    std::vector<CollisionBox *> dst_boxes;
-    dst_boxes.reserve(motion_boxes.size());
-
-    for (auto motion_box : motion_boxes)
+    CollisionBox *first_collided_box = nullptr;
+    float first_collided_time = delta + 1e-6f;
+    for (auto other_box : potential_collisions)
     {
-        if (m_rect.is_intersect(motion_box->get_rect()))
-            dst_boxes.push_back(motion_box);
-    }
-
-    if (dst_boxes.empty())
-        return;
-
-    auto first_collide_box = dst_boxes.front();
-    auto first_collide_time = m_rect.time_to_collide(origin_speed, first_collide_box->get_rect());
-
-    for (auto dst : dst_boxes)
-    {
-        auto current_collide_time = m_rect.time_to_collide(origin_speed, dst->get_rect());
-        if (current_collide_time < first_collide_time)
+        float t = origin_rect.time_to_collide(origin_speed, other_box->get_rect());
+        if (t <= 1e6 && is_collided)
+            continue;
+        if (t >= 0 && t < first_collided_time)
         {
-            first_collide_box = dst;
-            first_collide_time = current_collide_time;
+            first_collided_time = t;
+            first_collided_box = other_box;
         }
     }
 
-    if (first_collide_time >= delta - 1e-6f)
+    if (!first_collided_box || first_collided_time > delta)
+    {
+        Object::on_update(delta); // 使用基类方法一次性移动
+        box.set_rect(m_rect);
         return;
+    }
 
-    m_rect = origin_rect, m_speed = origin_speed;
-    Object::on_update(first_collide_time);
-    box.get_callback()(*first_collide_box);
-    on_update(delta - first_collide_time);
+    if (first_collided_time <= 1e-6)
+    {
+        if (this->is_collided)
+            return;
+
+        // 这是本帧第一次处理瞬时碰撞
+        if (box.get_callback() && first_collided_box)
+        {
+            box.get_callback()(*first_collided_box); // 处理碰撞（推开物体、更新速度）
+        }
+
+        this->is_collided = true;
+
+        update_recursive(delta);
+    }
+    else
+    {
+        Object::on_update(first_collided_time);
+        box.set_rect(m_rect);
+
+        if (box.get_callback() && first_collided_box)
+        {
+            box.get_callback()(*first_collided_box);
+        }
+
+        float remaining_time = delta - first_collided_time;
+        if (remaining_time > 1e-6)
+        {
+            update_recursive(remaining_time);
+        }
+    }
 }
 
 void PhysicalObject::handle_collide_obstacle(ObstacleObject &other)
@@ -150,6 +167,7 @@ void PhysicalObject::handle_collide_obstacle(ObstacleObject &other)
             box_rect.set_y(box_rect.get_y() + overlap_y);
         set_speed(Vec2(m_speed.get_x(), -m_speed.get_y()));
     }
+    box.set_rect(box_rect);
 
     set_speed(get_speed() * 0.9);
 }
