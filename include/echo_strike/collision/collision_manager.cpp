@@ -12,46 +12,54 @@ CollisionManager &CollisionManager::instance()
 
 CollisionBox *CollisionManager::create_collision_box()
 {
-    CollisionBox temp;
-    boxes.push_back(std::move(temp));
-    return &boxes.back();
+    boxes.push_back(new CollisionBox());
+    return boxes.back();
 }
 
 void CollisionManager::destroy_collision_box(CollisionBox *box)
 {
     boxes.erase(
-        std::find_if(
+        std::find(
             boxes.begin(),
             boxes.end(),
-            [box](CollisionBox &other)
-            { return &other == box; }));
+            box));
+
+    delete box;
+}
+
+CollisionManager::~CollisionManager()
+{
+    for (auto box : boxes)
+        delete box;
 }
 
 void CollisionManager::process_collide()
 {
-    for (auto &src_box : boxes)
+    for (auto src_box : boxes)
     {
-        if (!src_box.get_enable())
+        if (!src_box->get_enable())
             continue;
 
-        if (src_box.get_src() == CollisionLayer::None || src_box.get_dst().empty())
+        if (src_box->get_src() == CollisionLayer::None || src_box->get_dst().empty())
             continue;
 
-        for (auto &dst_box : boxes)
+        for (auto dst_box : boxes)
         {
-            if ((&src_box == &dst_box) || (!src_box.has_dst(dst_box.get_src())))
+            if ((&src_box == &dst_box) || (!src_box->has_dst(dst_box->get_src())))
                 continue;
 
-            if (!dst_box.get_enable())
+            puts("?!");
+
+            if (!dst_box->get_enable())
                 continue;
 
-            if (dst_box.get_src() == CollisionLayer::None)
+            if (dst_box->get_src() == CollisionLayer::None)
                 continue;
 
-            std::cout << "Hit!" << std::endl;
-            if (dst_box.collide_callback && dst_box.m_rect.is_intersect(src_box.m_rect))
+            if (dst_box->collide_callback && dst_box->m_rect.is_intersect(src_box->m_rect))
             {
-                dst_box.collide_callback(src_box);
+                std::cout << "Hit!" << std::endl;
+                dst_box->collide_callback(*src_box);
             }
         }
     }
@@ -59,6 +67,6 @@ void CollisionManager::process_collide()
 
 void CollisionManager::debug_render(SDL_Renderer *renderer) const
 {
-    for (auto &box : boxes)
-        box.render_border(renderer);
+    for (auto box : boxes)
+        box->render_border(renderer);
 }

@@ -17,11 +17,11 @@ public:
     void debug_render(SDL_Renderer *) const;
 
 private:
-    std::vector<CollisionBox> boxes;
+    std::vector<CollisionBox *> boxes;
 
 private:
     CollisionManager() = default;
-    ~CollisionManager() = default;
+    ~CollisionManager();
 
 public:
     size_t size() const { return boxes.size(); }
