@@ -24,7 +24,7 @@ set(SDL_TEST_LIBRARY OFF)
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/pjh_json)
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/echo_strike)
 
-add_executable(main ${CMAKE_SOURCE_DIR}/tests/test_physics.cpp)
+add_executable(main ${CMAKE_SOURCE_DIR}/tests/test_quadtree_optimization.cpp)
 target_link_libraries(main
     PRIVATE echo_strike_lib
     PRIVATE SDL3::SDL3
@@ -32,7 +32,7 @@ target_link_libraries(main
     PRIVATE SDL3_ttf::SDL3_ttf)
 
 if(WIN32)
-add_custom_command(
+    add_custom_command(
         TARGET main POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3::SDL3-shared> $<TARGET_FILE_DIR:main>
         COMMAND "${CMAKE_COMMAND}" -E copy $<TARGET_FILE:SDL3_ttf::SDL3_ttf> $<TARGET_FILE_DIR:main>

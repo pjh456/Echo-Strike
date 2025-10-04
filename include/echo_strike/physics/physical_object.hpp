@@ -31,8 +31,8 @@ public:
 
 private:
     void update_recursive(float);
-    void handle_collide_obstacle(ObstacleObject &);
-    void handle_collide_object(PhysicalObject &);
+    Vec2 handle_collide_obstacle(ObstacleObject &);
+    Vec2 handle_collide_object(PhysicalObject &);
 };
 
 #endif // INCLUDE_PHYSICAL_OBJECT
