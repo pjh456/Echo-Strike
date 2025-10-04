@@ -117,6 +117,24 @@ bool Rect::is_intersect(const Vec2 &pos) const
     return is_inside(pos) || is_on_edge(pos);
 }
 
+bool Rect::is_interset(const Ray &ray) const
+{
+    Vec2 top_left(left(), up()),
+        top_right(right(), up()),
+        bottom_left(left(), down()),
+        bottom_right(right(), down());
+
+    Ray left_ray(top_left, bottom_left),
+        right_ray(top_right, bottom_right),
+        top_ray(top_left, top_right),
+        bottom_ray(bottom_left, bottom_right);
+
+    return ray.is_intersect(left_ray) ||
+           ray.is_intersect(right_ray) ||
+           ray.is_intersect(top_ray) ||
+           ray.is_intersect(bottom_ray);
+}
+
 bool Rect::is_intersect(const Rect &rect) const
 {
     if (right() < rect.left() || left() > rect.right())

@@ -4,6 +4,7 @@
 #include <echo_strike/utils/class_marcos.hpp>
 
 #include <echo_strike/utils/vec2.hpp>
+#include <echo_strike/utils/ray.hpp>
 
 #include <SDL3/SDL.h>
 
@@ -51,6 +52,7 @@ public:
     bool is_on_edge(const Rect &) const;
 
     bool is_intersect(const Vec2 &) const;
+    bool is_interset(const Ray &) const;
     bool is_intersect(const Rect &) const;
 
     void render_border(SDL_Renderer *) const;
