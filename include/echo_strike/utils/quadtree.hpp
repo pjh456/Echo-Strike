@@ -5,7 +5,7 @@
 
 #include <cstdint>
 #include <vector>
-#include <utility>
+#include <algorithm>
 
 template <typename T>
 class QuadTree
@@ -95,20 +95,95 @@ private:
                     child[idx]->query(rect, result);
         }
 
-        /*
-            0------------------------> x
-            |          down
-            |       | 0 | 1 |
-            | left              right
-            |       | 2 | 3 |
-            |           up
-            |
-            V
-            y
+        Storage *find(const Rect &rect, T *val)
+        {
+            if (!boundary.is_intersect(rect))
+                return nullptr;
 
-            4 if not in [0, 3]
-            5 if out of range
-        */
+            auto it = std::find_if(
+                values.begin(),
+                values.end(),
+                [&](const Storage &storage)
+                { return storage.value == val; });
+
+            if (it != values.end())
+                return &(*it);
+
+            for (int idx = 0; idx < 4; ++idx)
+            {
+                if (child[idx] != nullptr)
+                {
+                    auto found = child[idx]->find(rect, val);
+                    if (found)
+                        return found;
+                }
+            }
+
+            return nullptr;
+        }
+
+        const Storage *find(const Rect &rect, T *val) const
+        {
+            if (!boundary.is_intersect(rect))
+                return nullptr;
+
+            auto it = std::find_if(
+                values.begin(),
+                values.end(),
+                [&](const Storage &storage)
+                { return storage.value == val; });
+
+            if (it != values.end())
+                return &(*it);
+
+            for (int idx = 0; idx < 4; ++idx)
+            {
+                if (child[idx] != nullptr)
+                {
+                    auto found = child[idx]->find(rect, val);
+                    if (found)
+                        return found;
+                }
+            }
+
+            return nullptr;
+        }
+
+        bool remove(const Rect &rect, T *val)
+        {
+            if (!boundary.is_intersect(rect))
+                return false;
+
+            for (auto it = values.begin(); it != values.end(); ++it)
+            {
+                if (it->value == val)
+                {
+                    values.erase(it);
+                    return true;
+                }
+            }
+
+            for (int idx = 0; idx < 4; ++idx)
+                if (child[idx] != nullptr && child[idx]->remove(rect, val))
+                    return true;
+
+            return false;
+        }
+
+        /*
+    0------------------------> x
+    |          down
+    |       | 0 | 1 |
+    | left              right
+    |       | 2 | 3 |
+    |           up
+    |
+    V
+    y
+
+    4 if not in [0, 3]
+    5 if out of range
+*/
         int get_rect_op(const Rect &rect) const
         {
             if (!rect.is_inside(boundary))
@@ -160,6 +235,17 @@ public:
         std::vector<T *> result;
         root->query(rect, result);
         return result;
+    }
+
+    Storage *find(const Rect &rect, T *val) { return root->find(rect, val); }
+    const Storage *find(const Rect &rect, T *val) const { return root->find(rect, val); }
+
+    bool remove(const Rect &rect, T *val) { return root->remove(rect, val); }
+
+    void update(const Rect &old_rect, const Rect &new_rect, T *val)
+    {
+        if (remove(old_rect, val))
+            insert(new_rect, val);
     }
 };
 
