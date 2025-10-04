@@ -35,7 +35,10 @@ private:
     CLASS_POINTER(Object, object)
 
 private:
-    CollisionBox() = default;
+    CollisionBox()
+        : m_object(nullptr)
+    {
+    }
 
 public:
     ~CollisionBox() = default;
