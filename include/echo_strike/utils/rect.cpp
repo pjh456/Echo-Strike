@@ -117,7 +117,7 @@ bool Rect::is_intersect(const Vec2 &pos) const
     return is_inside(pos) || is_on_edge(pos);
 }
 
-bool Rect::is_interset(const Ray &ray) const
+bool Rect::is_intersect(const Ray &ray) const
 {
 
     Ray left_ray(top_left(), bottom_left()),
