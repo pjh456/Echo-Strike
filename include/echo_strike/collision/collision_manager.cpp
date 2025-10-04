@@ -32,7 +32,7 @@ void CollisionManager::process_collide()
         if (!src_box.get_enable())
             continue;
 
-        if (src_box.get_src() == CollisionLayer::None)
+        if (src_box.get_src() == CollisionLayer::None || src_box.get_dst().empty())
             continue;
 
         for (auto &dst_box : boxes)
