@@ -19,7 +19,7 @@ public:
 private:
     std::vector<CollisionBox> boxes;
 
-public:
+private:
     CollisionManager() = default;
     ~CollisionManager() = default;
 

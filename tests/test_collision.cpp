@@ -13,7 +13,7 @@ int main()
     auto window = SDL_CreateWindow("Collision Test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
 
-    CollisionManager manager;
+    auto &manager = CollisionManager::instance();
     auto &box1 = *manager.create_collision_box();
     box1.set_rect(Rect{100, 100, 200, 200});
     box1.set_enable(true);

@@ -1,6 +1,7 @@
 #include <echo_strike/collision/collision_manager.hpp>
 
 #include <algorithm>
+#include <iostream>
 
 CollisionManager &CollisionManager::instance()
 {
@@ -46,8 +47,11 @@ void CollisionManager::process_collide()
             if (dst_box.get_src() == CollisionLayer::None)
                 continue;
 
+            std::cout << "Hit!" << std::endl;
             if (dst_box.collide_callback && dst_box.m_rect.is_intersect(src_box.m_rect))
+            {
                 dst_box.collide_callback(src_box);
+            }
         }
     }
 }
