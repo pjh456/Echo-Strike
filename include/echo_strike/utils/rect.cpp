@@ -48,9 +48,9 @@ bool Rect::is_strictly_inside(const Vec2 &pos) const
         return false;
     if (right() < pos.get_x())
         return false;
-    if (up() < pos.get_y())
+    if (top() < pos.get_y())
         return false;
-    if (down() > pos.get_y())
+    if (bottom() > pos.get_y())
         return false;
     return true;
 }
@@ -61,9 +61,9 @@ bool Rect::is_strictly_inside(const Rect &rect) const
         return false;
     if (right() >= rect.right())
         return false;
-    if (up() >= rect.up())
+    if (top() >= rect.top())
         return false;
-    if (down() <= rect.down())
+    if (bottom() <= rect.bottom())
         return false;
     return true;
 }
@@ -79,9 +79,9 @@ bool Rect::is_inside(const Rect &rect) const
         return false;
     if (right() > rect.right())
         return false;
-    if (up() > rect.up())
+    if (top() > rect.top())
         return false;
-    if (down() < rect.down())
+    if (bottom() < rect.bottom())
         return false;
     return true;
 }
@@ -92,9 +92,9 @@ bool Rect::is_on_edge(const Vec2 &pos) const
         return true;
     if (right() == pos.get_x())
         return true;
-    if (up() == pos.get_y())
+    if (top() == pos.get_y())
         return true;
-    if (down() == pos.get_y())
+    if (bottom() == pos.get_y())
         return true;
     return false;
 }
@@ -105,9 +105,9 @@ bool Rect::is_on_edge(const Rect &rect) const
         return true;
     if (right() == rect.right() || right() == rect.left())
         return true;
-    if (up() == rect.up() || up() == rect.down())
+    if (top() == rect.top() || top() == rect.bottom())
         return true;
-    if (down() == rect.down() || down() == rect.up())
+    if (bottom() == rect.bottom() || bottom() == rect.top())
         return true;
     return false;
 }
@@ -119,15 +119,11 @@ bool Rect::is_intersect(const Vec2 &pos) const
 
 bool Rect::is_interset(const Ray &ray) const
 {
-    Vec2 top_left(left(), up()),
-        top_right(right(), up()),
-        bottom_left(left(), down()),
-        bottom_right(right(), down());
 
-    Ray left_ray(top_left, bottom_left),
-        right_ray(top_right, bottom_right),
-        top_ray(top_left, top_right),
-        bottom_ray(bottom_left, bottom_right);
+    Ray left_ray(top_left(), bottom_left()),
+        right_ray(top_right(), bottom_right()),
+        top_ray(top_left(), top_right()),
+        bottom_ray(bottom_left(), bottom_right());
 
     return ray.is_intersect(left_ray) ||
            ray.is_intersect(right_ray) ||
@@ -140,7 +136,7 @@ bool Rect::is_intersect(const Rect &rect) const
     if (right() < rect.left() || left() > rect.right())
         return false;
 
-    if (down() > rect.up() || up() < rect.down())
+    if (bottom() > rect.top() || top() < rect.bottom())
         return false;
 
     return true;
@@ -226,17 +222,17 @@ float Rect::time_to_collide(const Vec2 &velocity, const Rect &target) const
 
     if (vy > 0)
     {
-        enter_time.set_y((target.down() - up()) / vy);
-        exit_time.set_y((target.up() - down()) / vy);
+        enter_time.set_y((target.bottom() - top()) / vy);
+        exit_time.set_y((target.top() - bottom()) / vy);
     }
     else if (vy < 0)
     {
-        enter_time.set_y((target.up() - down()) / vy);
-        exit_time.set_y((target.down() - up()) / vy);
+        enter_time.set_y((target.top() - bottom()) / vy);
+        exit_time.set_y((target.bottom() - top()) / vy);
     }
     else
     {
-        if (up() < target.down() || down() > target.up())
+        if (top() < target.bottom() || bottom() > target.top())
             return -1;
         else
         {

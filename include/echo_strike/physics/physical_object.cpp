@@ -1,5 +1,7 @@
 #include <echo_strike/physics/physical_object.hpp>
 
+#include <echo_strike/utils/ray.hpp>
+
 PhysicalObject::PhysicalObject()
     : box(*CollisionManager::instance().create_collision_box()),
       m_mess(1.0)
@@ -27,6 +29,48 @@ PhysicalObject::~PhysicalObject()
     CollisionManager::instance().destroy_collision_box(&box);
 }
 
+void PhysicalObject::on_update(float delta)
+{
+    auto origin_rect = m_rect;
+    auto origin_speed = m_speed;
+
+    // try to update
+    Object::on_update(delta);
+
+    auto top_left_motion_ray = Ray();
+
+    box.set_rect(m_rect);
+
+    auto dst_boxes = box.process_collide();
+    if (dst_boxes.empty())
+        return;
+
+    auto first_collide_box = dst_boxes.front();
+    auto first_collide_time = m_rect.time_to_collide(origin_speed, first_collide_box->get_rect());
+
+    for (auto dst : dst_boxes)
+    {
+        auto current_collide_time = m_rect.time_to_collide(origin_speed, dst->get_rect());
+        if (current_collide_time < first_collide_time)
+        {
+            first_collide_box = dst;
+            first_collide_time = current_collide_time;
+        }
+    }
+
+    if (first_collide_time > delta || is_collided)
+    {
+        is_collided = false;
+        return;
+    }
+
+    is_collided = true;
+    m_rect = origin_rect, m_speed = origin_speed;
+    Object::on_update(first_collide_time);
+    box.get_callback()(*first_collide_box);
+    on_update(delta - first_collide_time);
+}
+
 void PhysicalObject::handle_collide_obstacle(ObstacleObject &other)
 {
     if (m_speed.get_x() == 0 || m_speed.get_y() == 0)
@@ -42,8 +86,8 @@ void PhysicalObject::handle_collide_obstacle(ObstacleObject &other)
         box_rect.right() - other_box_rect.left(),
         other_box_rect.right() - box_rect.left());
     float overlap_y = std::min(
-        box_rect.up() - other_box_rect.down(),
-        other_box_rect.up() - box_rect.down());
+        box_rect.top() - other_box_rect.bottom(),
+        other_box_rect.top() - box_rect.bottom());
 
     if (overlap_x == overlap_y)
     {
@@ -80,8 +124,8 @@ void PhysicalObject::handle_collide_object(PhysicalObject &other)
         box_rect.right() - other_box_rect.left(),
         other_box_rect.right() - box_rect.left());
     float overlap_y = std::min(
-        box_rect.up() - other_box_rect.down(),
-        other_box_rect.up() - box_rect.down());
+        box_rect.top() - other_box_rect.bottom(),
+        other_box_rect.top() - box_rect.bottom());
 
     if (overlap_x < overlap_y)
     {
@@ -90,12 +134,12 @@ void PhysicalObject::handle_collide_object(PhysicalObject &other)
         {
             box.set_rect(
                 {box_rect.left() - correction,
-                 box_rect.down(),
+                 box_rect.bottom(),
                  box_rect.get_width(),
                  box_rect.get_height()});
             other.set_rect(
                 {other_box_rect.left() + correction,
-                 other_box_rect.down(),
+                 other_box_rect.bottom(),
                  other_box_rect.get_width(),
                  other_box_rect.get_height()});
         }
@@ -103,12 +147,12 @@ void PhysicalObject::handle_collide_object(PhysicalObject &other)
         {
             box.set_rect(
                 {box_rect.left() + correction,
-                 box_rect.down(),
+                 box_rect.bottom(),
                  box_rect.get_width(),
                  box_rect.get_height()});
             other.set_rect(
                 {other_box_rect.left() - correction,
-                 other_box_rect.down(),
+                 other_box_rect.bottom(),
                  other_box_rect.get_width(),
                  other_box_rect.get_height()});
         }
@@ -120,12 +164,12 @@ void PhysicalObject::handle_collide_object(PhysicalObject &other)
         {
             box.set_rect(
                 {box_rect.left(),
-                 box_rect.down() - correction,
+                 box_rect.bottom() - correction,
                  box_rect.get_width(),
                  box_rect.get_height()});
             other.set_rect(
                 {other_box_rect.left(),
-                 other_box_rect.down() + correction,
+                 other_box_rect.bottom() + correction,
                  other_box_rect.get_width(),
                  other_box_rect.get_height()});
         }
@@ -133,12 +177,12 @@ void PhysicalObject::handle_collide_object(PhysicalObject &other)
         {
             box.set_rect(
                 {box_rect.left(),
-                 box_rect.down() + correction,
+                 box_rect.bottom() + correction,
                  box_rect.get_width(),
                  box_rect.get_height()});
             other.set_rect(
                 {other_box_rect.left(),
-                 other_box_rect.down() - correction,
+                 other_box_rect.bottom() - correction,
                  other_box_rect.get_width(),
                  other_box_rect.get_height()});
         }

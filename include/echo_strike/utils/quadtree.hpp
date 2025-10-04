@@ -190,20 +190,20 @@ private:
                 return 5;
 
             auto mid_width = boundary.left() + boundary.get_width() * 0.5f;
-            auto mid_height = boundary.down() + boundary.get_height() * 0.5f;
+            auto mid_height = boundary.bottom() + boundary.get_height() * 0.5f;
 
             if (rect.right() < mid_width)
             {
-                if (rect.up() < mid_height)
+                if (rect.top() < mid_height)
                     return 0;
-                else if (rect.down() >= mid_height)
+                else if (rect.bottom() >= mid_height)
                     return 2;
             }
             else if (rect.left() >= mid_width)
             {
-                if (rect.up() < mid_height)
+                if (rect.top() < mid_height)
                     return 1;
-                else if (rect.down() >= mid_height)
+                else if (rect.bottom() >= mid_height)
                     return 3;
             }
             return 4;

@@ -38,8 +38,14 @@ public:
 public:
     float left() const { return m_x; }
     float right() const { return m_x + m_width; }
-    float up() const { return m_y + m_height; }
-    float down() const { return m_y; }
+    float top() const { return m_y + m_height; }
+    float bottom() const { return m_y; }
+
+public:
+    Vec2 top_left() const { return Vec2(left(), top()); }
+    Vec2 top_right() const { return Vec2(right(), top()); }
+    Vec2 bottom_left() const { return Vec2(left(), bottom()); }
+    Vec2 bottom_right() const { return Vec2(right(), bottom()); }
 
 public:
     bool is_strictly_inside(const Vec2 &) const;
