@@ -75,7 +75,7 @@ int main()
 
     // ---------- 测试 remove ----------
     {
-        bool removed = qt.remove(rb, &b);
+        bool removed = qt.remove(&b);
         assert(removed);
         auto *storage = qt.find(rb, &b);
         assert(storage == nullptr);
@@ -84,7 +84,7 @@ int main()
     // ---------- 测试 update ----------
     {
         Rect rc_new(70, 70, 10, 10);
-        qt.update(rc, rc_new, &c);
+        qt.update(rc_new, &c);
 
         // 原位置查不到
         auto *storage_old = qt.find(rc, &c);
