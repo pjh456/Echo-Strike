@@ -27,13 +27,7 @@ private:
 
 public:
     size_t size() const { return boxes.size(); }
-    void clear()
-    {
-        auto destroy_boxes = boxes;
-        for (auto &box : destroy_boxes)
-            destroy_collision_box(box);
-        boxes.clear();
-    }
+    void clear();
 
     std::vector<CollisionBox *> &collision_boxes() { return boxes; }
     const std::vector<CollisionBox *> &collision_boxes() const { return boxes; }

@@ -44,8 +44,15 @@ void CollisionManager::debug_render(SDL_Renderer *renderer) const
 
 CollisionManager::~CollisionManager()
 {
-    for (auto box : boxes)
-        delete box;
+    clear();
+}
+
+void CollisionManager::clear()
+{
+    auto destroy_boxes = boxes;
+    for (auto &box : destroy_boxes)
+        destroy_collision_box(box);
+    boxes.clear();
 }
 
 void CollisionManager::process_collide()
