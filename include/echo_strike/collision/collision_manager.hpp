@@ -27,7 +27,13 @@ private:
 
 public:
     size_t size() const { return boxes.size(); }
-    void clear() { boxes.clear(); }
+    void clear()
+    {
+        auto destroy_boxes = boxes;
+        for (auto &box : destroy_boxes)
+            destroy_collision_box(box);
+        boxes.clear();
+    }
 
     std::vector<CollisionBox *> &collision_boxes() { return boxes; }
     const std::vector<CollisionBox *> &collision_boxes() const { return boxes; }
@@ -35,6 +41,7 @@ public:
     QuadTree<CollisionBox> &quad_tree() { return m_quad_tree; }
     const QuadTree<CollisionBox> &quad_tree() const { return m_quad_tree; }
 
+public:
     void process_collide();
 };
 

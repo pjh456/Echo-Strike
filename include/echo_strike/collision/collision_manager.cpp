@@ -36,6 +36,12 @@ void CollisionManager::destroy_collision_box(CollisionBox *box)
     delete box;
 }
 
+void CollisionManager::debug_render(SDL_Renderer *renderer) const
+{
+    for (auto box : boxes)
+        box->render_border(renderer);
+}
+
 CollisionManager::~CollisionManager()
 {
     for (auto box : boxes)
@@ -53,10 +59,4 @@ void CollisionManager::process_collide()
                 dst_box->collide_callback(*src_box);
         }
     }
-}
-
-void CollisionManager::debug_render(SDL_Renderer *renderer) const
-{
-    for (auto box : boxes)
-        box->render_border(renderer);
 }
