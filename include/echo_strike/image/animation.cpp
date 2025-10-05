@@ -123,6 +123,9 @@ void Animation::add_frames(const Atlas &atlas)
 
 void Animation::render(SDL_Renderer *renderer) const
 {
+    if (frames.empty())
+        return;
+
     auto frame = get_current_frame();
     SDL_FRect dst;
     dst.w = frame.img->get_width(), dst.h = frame.img->get_height();
