@@ -189,11 +189,11 @@ private:
 
         /*
     0------------------------> x
-    |          down
+    |        bottom
     |       | 0 | 1 |
     | left              right
     |       | 2 | 3 |
-    |           up
+    |          top
     |
     V
     y
