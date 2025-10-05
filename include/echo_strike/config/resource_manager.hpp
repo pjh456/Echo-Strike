@@ -20,6 +20,7 @@ class ResourceManager
 public:
     using KeyType = std::u8string;
     using ResourcePool = std::unordered_map<KeyType, std::shared_ptr<void>>;
+    using AtlasPool = std::unordered_map<KeyType, std::shared_ptr<Atlas>>;
     using TypeTable = std::unordered_map<KeyType, std::type_index>;
 
 public:
@@ -36,12 +37,13 @@ public:
     std::shared_ptr<Image> load_texture(SDL_Renderer *, const std::filesystem::path &);
     std::shared_ptr<Image> load_texture(SDL_Renderer *, const std::u8string &);
 
-    std::tuple<size_t, Atlas> load_textures(SDL_Renderer *, const char *, size_t = 0);
-    std::vector<Atlas> load_texture_folder(SDL_Renderer *, const std::filesystem::path &, const char *);
+    std::tuple<size_t, std::shared_ptr<Atlas>> load_textures(SDL_Renderer *, const char *, size_t = 0);
+    std::vector<std::shared_ptr<Atlas>> load_texture_folder(SDL_Renderer *, const std::filesystem::path &, const char *);
 
 private:
     std::filesystem::path m_folder;
     ResourcePool m_cache;
+    AtlasPool m_atlases;
     TypeTable m_types;
 
 public:
@@ -91,6 +93,12 @@ public:
     ResourcePool &get_cache() { return m_cache; }
     const ResourcePool &get_cache() const { return m_cache; }
 
+    AtlasPool &get_atlases() { return m_atlases; }
+    const AtlasPool &get_atlases() const { return m_atlases; }
+
+    std::shared_ptr<Atlas> get_atlas(const KeyType &key) const;
+
+public:
     template <typename T>
     void store(const KeyType &key, std::shared_ptr<T> resource)
     {

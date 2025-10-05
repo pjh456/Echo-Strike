@@ -6,6 +6,7 @@
 #include <fstream>
 #include <algorithm>
 #include <format>
+#include <iostream>
 
 #include <SDL3/SDL_Render.h>
 #include <SDL3_image/SDL_image.h>
@@ -104,11 +105,16 @@ std::shared_ptr<Image> ResourceManager::load_texture(
     return load_texture(renderer, fs::path(path));
 }
 
-std::tuple<size_t, Atlas> ResourceManager::load_textures(
+std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_textures(
     SDL_Renderer *renderer,
     const char *template_str,
     size_t counts)
 {
+    auto abs_path = absolute_path(template_str).parent_path();
+    auto it = m_atlases.find(abs_path.u8string());
+    if (it != m_atlases.end())
+        return {it->second->size(), it->second};
+
     size_t success_count = 0;
     std::vector<Image> textures;
 
@@ -128,16 +134,22 @@ std::tuple<size_t, Atlas> ResourceManager::load_textures(
             break;
     }
 
-    return {success_count, Atlas(std::move(textures))};
+    auto ptr = std::make_shared<Atlas>(std::move(textures));
+    m_atlases.insert({abs_path.u8string(), ptr});
+
+    auto u8_atlas_name = relative_path_str(abs_path, abs_path.parent_path());
+    std::string atlas_name = std::format("{}", std::string(u8_atlas_name.begin(), u8_atlas_name.end()));
+    ptr->set_name(atlas_name);
+    return {success_count, ptr};
 }
 
-std::vector<Atlas> ResourceManager::load_texture_folder(
+std::vector<std::shared_ptr<Atlas>> ResourceManager::load_texture_folder(
     SDL_Renderer *renderer,
     const std::filesystem::path &folder_path,
     const char *template_str)
 {
     namespace fs = std::filesystem;
-    std::vector<Atlas> atlases;
+    std::vector<std::shared_ptr<Atlas>> atlases;
 
     auto full_path = absolute_path(folder_path);
 
@@ -169,7 +181,7 @@ std::vector<Atlas> ResourceManager::load_texture_folder(
         auto [count, atlas] = load_textures(renderer, full_template_str.c_str(), 0);
 
         if (count > 0)
-            atlases.push_back(std::move(atlas));
+            atlases.push_back(atlas);
     }
 
     return atlases;
@@ -279,4 +291,12 @@ std::u8string ResourceManager::relative_path_str(
 std::u8string ResourceManager::relative_path_str(const std::u8string &path, const std::u8string &base) const
 {
     return relative_path(path, base).u8string();
+}
+
+std::shared_ptr<Atlas> ResourceManager::get_atlas(const KeyType &key) const
+{
+    auto it = m_atlases.find(key);
+    if (it == m_atlases.end())
+        return nullptr;
+    return it->second;
 }

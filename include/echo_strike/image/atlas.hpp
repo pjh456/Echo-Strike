@@ -12,6 +12,7 @@ class Atlas
 {
 private:
     std::vector<Image> textures;
+    std::string name;
 
 public:
     Atlas();
@@ -35,6 +36,9 @@ public:
     size_t size() const { return textures.size(); }
     bool empty() const { return textures.empty(); }
     void clear();
+
+    std::string get_name() const { return name; }
+    void set_name(const std::string &str) { name = str; }
 
 public:
     Image &operator[](size_t);

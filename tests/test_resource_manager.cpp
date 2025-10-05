@@ -20,19 +20,27 @@ int main()
 
     auto window = SDL_CreateWindow("resource manager test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
+
+    auto dir = std::filesystem::path("E:/Projects/games/echo strike/resources");
+    auto atlases = manager.load_texture_folder(
+        renderer,
+        dir,
+        "{}.png");
+
+    std::cout << "Load "
+              << atlases.size()
+              << " atlas in the directory."
+              << std::endl;
+    for (auto atlas : atlases)
+        std::cout << "Atlas name: " << atlas->get_name() << std::endl;
+
     auto [count, atlas] = manager.load_textures(
         renderer,
         "../resources/enemy/aim/{}.png");
-
-    auto atlases = manager.load_texture_folder(
-        renderer,
-        "E:/Projects/games/echo strike/resources",
-        "{}.png");
-
-    printf("Load %d atlas in the directory.\n", atlases.size());
+    std::cout << "Loaded Atlas's name: " << atlas->get_name() << std::endl;
 
     Animation animation(50);
-    animation.add_frames(atlas);
+    animation.add_frames(*atlas);
 
     auto now = std::chrono::high_resolution_clock::now();
 

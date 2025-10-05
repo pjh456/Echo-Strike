@@ -25,7 +25,8 @@ Atlas::Atlas(std::vector<Image> &&texs) noexcept
 Atlas::~Atlas() { clear(); }
 
 Atlas::Atlas(Atlas &&other) noexcept
-    : textures(std::move(other.textures))
+    : textures(std::move(other.textures)),
+      name(std::move(other.name))
 {
 }
 
@@ -34,6 +35,7 @@ Atlas &Atlas::operator=(Atlas &&other) noexcept
     if (this == &other)
         return *this;
     textures = std::move(other.textures);
+    name = std::move(other.name);
     return *this;
 }
 
