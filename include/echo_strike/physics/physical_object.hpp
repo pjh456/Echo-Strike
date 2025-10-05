@@ -27,14 +27,13 @@ public:
     ~PhysicalObject();
 
 public:
-    void on_update(float);
+    void advance_state(float time_step);
 
 public:
     CollisionBox &collision_box() { return box; }
     const CollisionBox &collision_box() const { return box; }
 
 private:
-    void sub_step_move(float &);
     std::pair<float, CollisionBox *> find_first_collision(float);
     void resolve_penetration_pair(ObstacleObject &);
     void resolve_penetration_pair(PhysicalObject &);

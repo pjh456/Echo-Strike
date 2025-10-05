@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include <echo_strike/physics/physical_object.hpp>
+#include <echo_strike/physics/physics_manager.hpp>
 #include <echo_strike/physics/obstacle_object.hpp>
 #include <echo_strike/collision/collision_manager.hpp>
 
@@ -15,9 +16,6 @@ int main()
 
     auto window = SDL_CreateWindow("Collision Test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
-
-    std::vector<PhysicalObject *> particles;
-    std::vector<PhysicalObject *> del_particles;
 
     std::mt19937 rng(std::random_device{}());
     std::uniform_real_distribution<float> speed_dist(100.0f, 300.0f);
@@ -65,12 +63,11 @@ int main()
                 float speed_val = speed_dist(rng);
                 Vec2 velocity(dir.get_x() * speed_val, dir.get_y() * speed_val);
 
-                auto *p = new PhysicalObject();
+                auto *p = PhysicsManager::instance().create_physical_object();
                 p->set_rect(Rect(30, 30, 25, 25));
                 p->set_speed(velocity);
                 p->set_force(gravity);
                 p->set_mess(1.0f);
-                particles.push_back(p);
 
                 assert(p->collision_box().get_src() == CollisionLayer::Physics);
                 assert(p->collision_box().has_dst(CollisionLayer::Physics));
@@ -80,31 +77,21 @@ int main()
             }
         }
 
-        for (auto *p : particles)
+        for (auto *p : PhysicsManager::instance().objects())
         {
-            if (p->get_rect().is_intersect(boundary))
-                p->on_update(delta);
-            else
-                del_particles.push_back(p);
+            if (!(p->get_rect().is_intersect(boundary)))
+                PhysicsManager::instance().destroy_physical_object(p);
         }
-
-        for (auto p : del_particles)
-        {
-            puts("destroy particle!");
-            particles.erase(std::find(particles.begin(), particles.end(), p));
-            delete p;
-        }
-        del_particles.clear();
 
         // CollisionManager::instance().process_collide();
+        PhysicsManager::instance().on_update(delta);
 
         // 绘制
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        for (auto *p : particles)
-            p->render_full(renderer);
+        PhysicsManager::instance().render(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         for (auto *w : walls)
@@ -115,8 +102,6 @@ int main()
         SDL_Delay(16);
     }
 
-    for (auto *p : particles)
-        delete p;
     for (auto *w : walls)
         delete w;
 

@@ -32,64 +32,10 @@ PhysicalObject::~PhysicalObject()
     CollisionManager::instance().destroy_collision_box(&box);
 }
 
-// ====================================================================================
-// 段落 2: 主更新函数 (逻辑总控)
-// 这是更新物理状态的公共入口。
-// ====================================================================================
-
-void PhysicalObject::on_update(float delta)
+void PhysicalObject::advance_state(float time_step)
 {
-    // 连续碰撞检测与响应循环 (CCD)
-    // 我们将总时间 `delta` 分解为更小的子步骤，从一个碰撞事件推进到下一个。
-    float remaining_time = delta;
-    const int max_sub_steps = 10; // 设置安全上限，防止因意外情况导致无限循环
-
-    for (int i = 0; i < max_sub_steps && remaining_time > 1e-6f; ++i)
-    {
-        sub_step_move(remaining_time);
-    }
-}
-
-// ====================================================================================
-// 段落 3: 子步骤逻辑与辅助函数
-// 这些函数实现了核心的CCD循环。
-// ====================================================================================
-
-/**
- * @brief 执行单次移动的子步骤。它会找到下一次最早的碰撞，将时间推进到该点，
- *        处理碰撞，然后更新剩余时间。
- * @param remaining_time 引用传递，代表当前更新周期中剩余的时间。此函数会修改它的值。
- */
-void PhysicalObject::sub_step_move(float &remaining_time)
-{
-    // 在剩余时间窗口内，查找最早发生的碰撞。
-    auto [time_of_impact, first_collided_box] = find_first_collision(remaining_time);
-
-    // 情况 A: 在剩余时间内不会发生碰撞。
-    if (!first_collided_box || time_of_impact > remaining_time)
-    {
-        // 将物体移动完所有剩余时间，然后结束。
-        Object::on_update(remaining_time);
-        box.set_rect(m_rect);
-        remaining_time = 0.0f; // 发出信号，告知主循环我们已经完成。
-    }
-    // 情况 B: 找到了一个未来的碰撞。
-    else
-    {
-        // 精确地将物体移动到碰撞发生的那一刻。
-        Object::on_update(time_of_impact);
-        box.set_rect(m_rect);
-
-        // 现在物体们正好处在完美接触的状态，触发碰撞响应回调函数，
-        // 来处理速度上的变化（通过冲量计算）。
-        if (box.get_callback() && first_collided_box)
-        {
-            box.get_callback()(*first_collided_box);
-        }
-
-        // 从总时间中减去已经过的时间，让主循环用剩余的时间进行下一次子步骤迭代。
-        remaining_time -= time_of_impact;
-    }
+    Object::on_update(time_step);
+    box.set_rect(m_rect);
 }
 
 /**
@@ -167,7 +113,7 @@ void PhysicalObject::resolve_penetration_pair(ObstacleObject &wall)
     }
 
     const float k_slop = 0.01f; // 允许的微小重叠，防止抖动
-    const float percent = 0.8f; // 推开力量的百分比，防止弹射过猛
+    const float percent = 1.0f; // 推开力量的百分比，防止弹射过猛
     Vec2 correction = correction_normal * std::max(penetration_depth - k_slop, 0.0f) * percent;
     // 直接将物体沿修正法线方向移出墙体
     this->set_rect(box_rect + correction);
@@ -183,7 +129,7 @@ void PhysicalObject::resolve_penetration_pair(PhysicalObject &other)
     Vec2 n = center2 - center1; // 从 this 指向 other 的向量
 
     if (n.length() < 1e-6f)
-        n = Vec2(0, 1.0f); // 处理完美重叠的特殊情况
+        n = Vec2(0, -1.0f); // 处理完美重叠的特殊情况
 
     Vec2 half_size1 = box_rect.size() * 0.5f;
     Vec2 half_size2 = other_box_rect.size() * 0.5f;
@@ -263,19 +209,18 @@ void PhysicalObject::handle_collision_response(ObstacleObject &wall)
 
     // --- [标准的冲量计算] ---
     Vec2 u_obj = this->get_speed();
-    Vec2 relative_velocity = u_obj; // V_obj - V_wall(0)
-    float vel_along_normal = relative_velocity.get_x() * contact_normal.get_x() + relative_velocity.get_y() * contact_normal.get_y();
+    Vec2 relative_velocity = u_obj;
+    float vel_along_normal = relative_velocity.dot(contact_normal); // 使用点积更标准
 
-    // 如果物体速度方向 与 推开它的法线方向 是相反的(点积<0)，说明正在撞过去。
-    // 如果是同向的(点积>0)，说明正在远离，无需处理。
-    // if (vel_along_normal > 0)
-    //     return;
+    // 【重要】如果物体已经在远离墙壁，则不进行任何处理
+    if (vel_along_normal > 0)
+        return;
 
     float restitution = 0.8f;
-    // 注意这里的公式，因为 relative_velocity = u_obj，所以 vel_along_normal 是 u_obj 在法线上的投影。
-    // 我们需要反转它，所以冲量公式里没有负号。
+    // 冲量公式 j 的分子是 -(1 + e) * v_rel_normal
+    // 因为这里 v_rel_normal 已经保证是负数或零，所以整个冲量 j 是正数，代表一个推开的力
     float j = -(1 + restitution) * vel_along_normal;
-    j /= (1 / m_mess);
+    j /= (1 / m_mess); // 除以逆质量
 
     Vec2 impulse = contact_normal * j;
 
@@ -315,8 +260,9 @@ void PhysicalObject::handle_collision_response(PhysicalObject &other)
     float m2 = other.get_mess();
 
     Vec2 relative_velocity = u2 - u1;
-    float vel_along_normal = relative_velocity.get_x() * contact_normal.get_x() + relative_velocity.get_y() * contact_normal.get_y();
+    float vel_along_normal = relative_velocity.dot(contact_normal); // 使用点积更标准
 
+    // 【重要】如果两个物体已经在沿法线方向互相远离，则不处理
     if (vel_along_normal > 0)
         return;
 
