@@ -8,6 +8,7 @@
 
 #include <SDL3/SDL.h>
 
+#include <initializer_list>
 #include <ostream>
 
 class Rect
@@ -46,6 +47,9 @@ public:
     Vec2 top_right() const { return Vec2(right(), top()); }
     Vec2 bottom_left() const { return Vec2(left(), bottom()); }
     Vec2 bottom_right() const { return Vec2(right(), bottom()); }
+
+public:
+    static Rect bounding_box(std::initializer_list<Rect>);
 
 public:
     bool is_strictly_inside(const Vec2 &) const;

@@ -2,6 +2,8 @@
 
 #include <echo_strike/utils/color.hpp>
 
+#include <algorithm>
+
 Rect::Rect(float x, float y, float w, float h)
     : m_x(x), m_y(y),
       m_width(w), m_height(h)
@@ -40,6 +42,43 @@ SDL_FRect Rect::to_frect() const
     ret.x = m_x, ret.y = m_y;
     ret.w = m_width, ret.h = m_height;
     return ret;
+}
+
+Rect Rect::bounding_box(std::initializer_list<Rect> rects)
+{
+    auto min_x =
+        std::min_element(
+            rects.begin(),
+            rects.end(),
+            [](auto const &a, auto const &b)
+            { return a.get_x() < b.get_x(); })
+            ->get_x();
+
+    auto min_y =
+        std::min_element(
+            rects.begin(),
+            rects.end(),
+            [](auto const &a, auto const &b)
+            { return a.get_y() < b.get_y(); })
+            ->get_y();
+
+    auto max_x =
+        std::min_element(
+            rects.begin(),
+            rects.end(),
+            [](auto const &a, auto const &b)
+            { return a.get_x() > b.get_x(); })
+            ->get_x();
+
+    auto max_y =
+        std::min_element(
+            rects.begin(),
+            rects.end(),
+            [](auto const &a, auto const &b)
+            { return a.get_y() > b.get_y(); })
+            ->get_y();
+
+    return Rect(min_x, min_y, max_x - min_x, max_y - min_y);
 }
 
 bool Rect::is_strictly_inside(const Vec2 &pos) const
