@@ -10,8 +10,12 @@
 
 #include <iostream>
 
+class PhysicsManager;
+
 class PhysicalObject : public Object
 {
+    friend PhysicsManager;
+
 private:
     CollisionBox &box;
     CLASS_PROPERTY(float, mess);
@@ -30,9 +34,13 @@ public:
     const CollisionBox &collision_box() const { return box; }
 
 private:
-    void update_recursive(float);
-    Vec2 handle_collide_obstacle(ObstacleObject &);
-    Vec2 handle_collide_object(PhysicalObject &);
+    void sub_step_move(float &);
+    std::pair<float, CollisionBox *> find_first_collision(float);
+    void resolve_penetration_pair(ObstacleObject &);
+    void resolve_penetration_pair(PhysicalObject &);
+
+    void handle_collision_response(ObstacleObject &);
+    void handle_collision_response(PhysicalObject &);
 };
 
 #endif // INCLUDE_PHYSICAL_OBJECT
