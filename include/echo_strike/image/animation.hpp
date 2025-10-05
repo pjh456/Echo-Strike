@@ -7,7 +7,7 @@
 #include <echo_strike/utils/rect.hpp>
 #include <echo_strike/core/timer.hpp>
 #include <echo_strike/image/image.hpp>
-#include <echo_strike/image/altas.hpp>
+#include <echo_strike/image/atlas.hpp>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>

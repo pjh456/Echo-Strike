@@ -1,4 +1,4 @@
-#include <echo_strike/image/altas.hpp>
+#include <echo_strike/image/atlas.hpp>
 
 #include <utility>
 #include <format>
