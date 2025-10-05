@@ -51,32 +51,32 @@ Rect Rect::bounding_box(std::initializer_list<Rect> rects)
             rects.begin(),
             rects.end(),
             [](auto const &a, auto const &b)
-            { return a.get_x() < b.get_x(); })
-            ->get_x();
+            { return a.left() < b.left(); })
+            ->left();
 
     auto min_y =
         std::min_element(
             rects.begin(),
             rects.end(),
             [](auto const &a, auto const &b)
-            { return a.get_y() < b.get_y(); })
-            ->get_y();
+            { return a.bottom() < b.bottom(); })
+            ->bottom();
 
     auto max_x =
-        std::min_element(
+        std::max_element(
             rects.begin(),
             rects.end(),
             [](auto const &a, auto const &b)
-            { return a.get_x() > b.get_x(); })
-            ->get_x();
+            { return a.right() < b.right(); })
+            ->right();
 
     auto max_y =
-        std::min_element(
+        std::max_element(
             rects.begin(),
             rects.end(),
             [](auto const &a, auto const &b)
-            { return a.get_y() > b.get_y(); })
-            ->get_y();
+            { return a.top() < b.top(); })
+            ->top();
 
     return Rect(min_x, min_y, max_x - min_x, max_y - min_y);
 }
