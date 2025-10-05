@@ -1,0 +1,117 @@
+#ifndef INCLUDE_RESOURCE_MANAGER
+#define INCLUDE_RESOURCE_MANAGER
+
+#include <string>
+#include <memory>
+#include <unordered_map>
+#include <filesystem>
+#include <typeindex>
+#include <tuple>
+#include <vector>
+
+struct SDL_Texture;
+struct SDL_Renderer;
+
+class ResourceManager
+{
+public:
+    using KeyType = std::u8string;
+    using ResourcePool = std::unordered_map<KeyType, std::shared_ptr<void>>;
+    using TypeTable = std::unordered_map<KeyType, std::type_index>;
+
+public:
+    static ResourceManager &instance();
+
+    std::shared_ptr<std::string> load_resource_str(const std::filesystem::path &);
+    std::shared_ptr<std::string> load_resource_str(const std::u8string &);
+
+    void destroy_resource(const std::filesystem::path &);
+    void destroy_resource(const std::u8string &);
+    void destroy_resource(void *);
+
+public:
+    std::shared_ptr<SDL_Texture> load_texture(SDL_Renderer *, const std::filesystem::path &);
+    std::shared_ptr<SDL_Texture> load_texture(SDL_Renderer *, const std::u8string &);
+
+    std::tuple<
+        size_t,
+        std::vector<std::shared_ptr<SDL_Texture>>>
+    load_textures(SDL_Renderer *, const char *, size_t);
+
+private:
+    std::filesystem::path m_folder;
+    ResourcePool m_cache;
+    TypeTable m_types;
+
+public:
+    ResourceManager()
+    {
+        set_default_folder();
+    }
+    ~ResourceManager() = default;
+
+    void set_default_folder();
+
+    bool set_resource_folder(const std::filesystem::path &);
+    bool set_resource_folder(const std::u8string &);
+
+public:
+    bool is_exist(const std::filesystem::path &) const;
+    bool is_exist(const std::u8string &) const;
+
+    bool is_file(const std::filesystem::path &) const;
+    bool is_file(const std::u8string &) const;
+
+    bool is_directory(const std::filesystem::path &) const;
+    bool is_directory(const std::u8string &) const;
+
+public:
+    std::filesystem::path absolute_path(const std::filesystem::path &) const;
+    std::filesystem::path absolute_path(const std::u8string &) const;
+
+    std::filesystem::path relative_path(
+        const std::filesystem::path &,
+        const std::filesystem::path & = std::filesystem::current_path()) const;
+    std::filesystem::path relative_path(
+        const std::u8string &,
+        const std::u8string & = std::filesystem::current_path().u8string()) const;
+
+    std::u8string absolute_path_str(const std::filesystem::path &) const;
+    std::u8string absolute_path_str(const std::u8string &) const;
+
+    std::u8string relative_path_str(
+        const std::filesystem::path &,
+        const std::filesystem::path & = std::filesystem::current_path()) const;
+    std::u8string relative_path_str(
+        const std::u8string &,
+        const std::u8string & = std::filesystem::current_path().u8string()) const;
+
+public:
+    ResourcePool &get_cache() { return m_cache; }
+    const ResourcePool &get_cache() const { return m_cache; }
+
+    template <typename T>
+    void store(const KeyType &key, std::shared_ptr<T> resource)
+    {
+        m_cache[key] = resource;
+        auto it = m_types.find(key);
+        if (it == m_types.end() || it->second != std::type_index(typeid(T)))
+            m_types.insert({key, std::type_index(typeid(T))});
+    }
+
+    template <typename T>
+    std::shared_ptr<T> get(const KeyType &key)
+    {
+        auto cache_it = m_cache.find(key);
+        if (cache_it == m_cache.end())
+            return nullptr;
+
+        auto type_it = m_types.find(key);
+        if (type_it == m_types.end() || type_it->second != std::type_index(typeid(T)))
+            throw std::bad_cast();
+
+        return std::static_pointer_cast<T>(cache_it->second);
+    }
+};
+
+#endif // INCLUDE_RESOURCE_MANAGER

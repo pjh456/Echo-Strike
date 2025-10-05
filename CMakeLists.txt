@@ -24,7 +24,7 @@ set(SDL_TEST_LIBRARY OFF)
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/pjh_json)
 add_subdirectory(${CMAKE_SOURCE_DIR}/include/echo_strike)
 
-add_executable(main ${CMAKE_SOURCE_DIR}/tests/test_animation.cpp)
+add_executable(main ${CMAKE_SOURCE_DIR}/tests/test_resource_manager.cpp)
 target_link_libraries(main
     PRIVATE echo_strike_lib
     PRIVATE SDL3::SDL3
