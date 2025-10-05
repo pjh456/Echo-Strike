@@ -18,7 +18,7 @@ private:
 
 public:
     Image(SDL_Texture *);
-    ~Image();
+    ~Image() = default;
 
     Image(const Image &) = delete;
     Image &operator=(const Image &) = delete;

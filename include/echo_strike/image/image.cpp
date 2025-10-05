@@ -11,12 +11,6 @@ Image::Image(SDL_Texture *p_tex)
     m_height = static_cast<int>(fh);
 }
 
-Image::~Image()
-{
-    if (tex != nullptr)
-        SDL_DestroyTexture(tex);
-}
-
 Image::Image(Image &&other) noexcept
     : tex(other.tex),
       m_width(other.m_width),
