@@ -1,5 +1,8 @@
 #include <echo_strike/config/resource_manager.hpp>
 
+#include <echo_strike/image/image.hpp>
+#include <echo_strike/image/atlas.hpp>
+
 #include <fstream>
 #include <algorithm>
 #include <format>
@@ -71,40 +74,29 @@ void ResourceManager::destroy_resource(void *ptr)
         m_cache.erase(it);
 }
 
-std::shared_ptr<SDL_Texture> ResourceManager::load_texture(
+std::shared_ptr<Image> ResourceManager::load_texture(
     SDL_Renderer *renderer,
     const std::filesystem::path &path)
 {
     auto key = absolute_path_str(path);
-    puts(absolute_path(path).string().c_str());
 
     if (!is_file(path))
         return nullptr;
 
-    if (auto cached = get<SDL_Texture>(key))
+    if (auto cached = get<Image>(key))
         return cached;
 
     auto raw = IMG_LoadTexture(renderer, path.string().c_str());
     if (!raw)
         return nullptr;
 
-    auto deleter = [](SDL_Texture *t)
-    {
-        // try
-        // {
-        //     SDL_DestroyTexture(t);
-        // }
-        // catch (...)
-        // {
-        // }
-    };
-    auto tex = std::shared_ptr<SDL_Texture>(raw, deleter);
-    store<SDL_Texture>(key, tex);
+    auto img = std::make_shared<Image>(raw);
+    store<Image>(key, img);
 
-    return tex;
+    return img;
 }
 
-std::shared_ptr<SDL_Texture> ResourceManager::load_texture(
+std::shared_ptr<Image> ResourceManager::load_texture(
     SDL_Renderer *renderer,
     const std::u8string &path)
 {
@@ -112,19 +104,17 @@ std::shared_ptr<SDL_Texture> ResourceManager::load_texture(
     return load_texture(renderer, fs::path(path));
 }
 
-std::tuple<
-    size_t,
-    std::vector<std::shared_ptr<SDL_Texture>>>
-ResourceManager::load_textures(
+std::tuple<size_t, Atlas> ResourceManager::load_textures(
     SDL_Renderer *renderer,
     const char *template_str,
     size_t counts)
 {
     size_t success_count = 0;
-    std::vector<std::shared_ptr<SDL_Texture>> textures;
-    textures.reserve(counts);
+    std::vector<Image> textures;
 
-    for (size_t idx = 0; idx < counts; ++idx)
+    for (size_t idx = 0;
+         counts == 0 ? true : idx < counts;
+         ++idx)
     {
         auto fmt_path = std::vformat(template_str, std::make_format_args(idx));
         auto tex_ptr = load_texture(renderer, fmt_path);
@@ -132,11 +122,57 @@ ResourceManager::load_textures(
         if (tex_ptr.get() != nullptr)
         {
             success_count++;
-            textures.push_back(tex_ptr);
+            textures.push_back(std::move(*tex_ptr.get()));
         }
+        else if (idx != 0)
+            break;
     }
 
-    return {success_count, textures};
+    return {success_count, Atlas(std::move(textures))};
+}
+
+std::vector<Atlas> ResourceManager::load_texture_folder(
+    SDL_Renderer *renderer,
+    const std::filesystem::path &folder_path,
+    const char *template_str)
+{
+    namespace fs = std::filesystem;
+    std::vector<Atlas> atlases;
+
+    auto full_path = absolute_path(folder_path);
+
+    if (!is_directory(full_path))
+        return {};
+
+    std::vector<fs::directory_entry> dirs;
+    for (auto &entry : fs::directory_iterator(full_path))
+        if (entry.is_directory())
+            dirs.push_back(entry);
+
+    while (!dirs.empty())
+    {
+        auto entry = dirs.back();
+        dirs.pop_back();
+
+        for (auto &subentry : fs::directory_iterator(entry))
+            if (subentry.is_directory())
+                dirs.push_back(subentry);
+
+        const auto &subfolder = entry.path();
+
+        auto subfolder_str = subfolder.u8string();
+        auto full_subpath = subfolder / template_str;
+        auto full_template = full_subpath.u8string();
+        auto full_template_str = std::string(full_template.begin(), full_template.end());
+
+        // 调用 load_textures 自动加载 Atlas
+        auto [count, atlas] = load_textures(renderer, full_template_str.c_str(), 0);
+
+        if (count > 0)
+            atlases.push_back(std::move(atlas));
+    }
+
+    return atlases;
 }
 
 void ResourceManager::set_default_folder()

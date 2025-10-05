@@ -15,6 +15,8 @@ private:
 
 public:
     Atlas();
+    Atlas(const std::vector<SDL_Texture *> &);
+    Atlas(std::vector<Image> &&) noexcept;
     ~Atlas();
 
     Atlas(const Atlas &) = delete;
@@ -29,8 +31,6 @@ public:
 
     bool insert(size_t, SDL_Texture *);
     bool insert(SDL_Renderer *, size_t, const char *);
-
-    size_t load(SDL_Renderer *, const char *, size_t);
 
     size_t size() const { return textures.size(); }
     bool empty() const { return textures.empty(); }

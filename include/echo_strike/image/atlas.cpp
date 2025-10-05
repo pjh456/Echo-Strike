@@ -5,6 +5,23 @@
 
 Atlas::Atlas() = default;
 
+Atlas::Atlas(const std::vector<SDL_Texture *> &texs)
+{
+    if (texs.empty())
+        return;
+
+    textures.reserve(texs.size());
+    for (const auto &tex : texs)
+    {
+        textures.emplace_back(tex);
+    }
+}
+
+Atlas::Atlas(std::vector<Image> &&texs) noexcept
+    : textures(std::move(texs))
+{
+}
+
 Atlas::~Atlas() { clear(); }
 
 Atlas::Atlas(Atlas &&other) noexcept
@@ -46,20 +63,6 @@ bool Atlas::insert(size_t index, SDL_Texture *tex)
 bool Atlas::insert(SDL_Renderer *renderer, size_t index, const char *path)
 {
     return this->insert(index, IMG_LoadTexture(renderer, path));
-}
-
-size_t Atlas::load(SDL_Renderer *renderer, const char *template_str, size_t counts)
-{
-    size_t success_count = 0;
-    textures.reserve(counts);
-
-    for (size_t idx = 0; idx < counts; ++idx)
-    {
-        auto fmt_path = std::vformat(template_str, std::make_format_args(idx));
-        if (this->push_back(renderer, fmt_path.c_str()))
-            success_count++;
-    }
-    return success_count;
 }
 
 void Atlas::clear()

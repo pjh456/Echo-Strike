@@ -18,17 +18,18 @@ int main()
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    Atlas atlas;
     auto window = SDL_CreateWindow("resource manager test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
-    // atlas.push_back(manager.load_texture(renderer, "../resources/enemy/aim/1.png").get());
-    auto [count, texs] = manager.load_textures(
+    auto [count, atlas] = manager.load_textures(
         renderer,
-        "../resources/enemy/aim/{}.png",
-        10);
-    // std::cout << atlas.load(renderer, "E:/Projects/games/echo strike/resources/enemy/aim/{}.png", 10) << std::endl;
-    for (auto tex : texs)
-        atlas.push_back(tex.get());
+        "../resources/enemy/aim/{}.png");
+
+    auto atlases = manager.load_texture_folder(
+        renderer,
+        "E:/Projects/games/echo strike/resources",
+        "{}.png");
+
+    printf("Load %d atlas in the directory.\n", atlases.size());
 
     Animation animation(50);
     animation.add_frames(atlas);

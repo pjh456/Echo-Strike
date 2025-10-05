@@ -12,6 +12,9 @@
 struct SDL_Texture;
 struct SDL_Renderer;
 
+class Image;
+class Atlas;
+
 class ResourceManager
 {
 public:
@@ -30,13 +33,11 @@ public:
     void destroy_resource(void *);
 
 public:
-    std::shared_ptr<SDL_Texture> load_texture(SDL_Renderer *, const std::filesystem::path &);
-    std::shared_ptr<SDL_Texture> load_texture(SDL_Renderer *, const std::u8string &);
+    std::shared_ptr<Image> load_texture(SDL_Renderer *, const std::filesystem::path &);
+    std::shared_ptr<Image> load_texture(SDL_Renderer *, const std::u8string &);
 
-    std::tuple<
-        size_t,
-        std::vector<std::shared_ptr<SDL_Texture>>>
-    load_textures(SDL_Renderer *, const char *, size_t);
+    std::tuple<size_t, Atlas> load_textures(SDL_Renderer *, const char *, size_t = 0);
+    std::vector<Atlas> load_texture_folder(SDL_Renderer *, const std::filesystem::path &, const char *);
 
 private:
     std::filesystem::path m_folder;
