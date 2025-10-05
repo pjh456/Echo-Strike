@@ -20,7 +20,7 @@ Atlas &Atlas::operator=(Atlas &&other) noexcept
     return *this;
 }
 
-bool Atlas::push_back(SDL_Renderer *renderer, SDL_Texture *tex)
+bool Atlas::push_back(SDL_Texture *tex)
 {
     if (tex == nullptr)
         return false;
@@ -30,10 +30,10 @@ bool Atlas::push_back(SDL_Renderer *renderer, SDL_Texture *tex)
 
 bool Atlas::push_back(SDL_Renderer *renderer, const char *path)
 {
-    return this->push_back(renderer, IMG_LoadTexture(renderer, path));
+    return this->push_back(IMG_LoadTexture(renderer, path));
 }
 
-bool Atlas::insert(SDL_Renderer *renderer, size_t index, SDL_Texture *tex)
+bool Atlas::insert(size_t index, SDL_Texture *tex)
 {
     if (tex == nullptr)
         return false;
@@ -45,7 +45,7 @@ bool Atlas::insert(SDL_Renderer *renderer, size_t index, SDL_Texture *tex)
 
 bool Atlas::insert(SDL_Renderer *renderer, size_t index, const char *path)
 {
-    return this->insert(renderer, index, IMG_LoadTexture(renderer, path));
+    return this->insert(index, IMG_LoadTexture(renderer, path));
 }
 
 size_t Atlas::load(SDL_Renderer *renderer, const char *template_str, size_t counts)
