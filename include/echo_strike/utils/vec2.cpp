@@ -111,3 +111,8 @@ float Vec2::cross(const Vec2 &other) const
 {
     return m_x * other.m_y - m_y * other.m_x;
 }
+
+float Vec2::dot(const Vec2 &other) const
+{
+    return m_x * other.m_x + m_y * other.m_y;
+}

@@ -43,6 +43,7 @@ public:
     float manhattan_dis(const Vec2 &) const;
 
     float cross(const Vec2 &) const;
+    float dot(const Vec2 &) const;
 };
 
 inline Vec2 operator*(float ratio, const Vec2 &vec2) { return vec2.operator*(ratio); }
