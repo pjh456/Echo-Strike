@@ -1,8 +1,6 @@
 #ifndef INCLUDE_WINDOW
 #define INCLUDE_WINDOW
 
-#include <echo_strike/utils/class_marcos.hpp>
-
 #include <cstdint>
 #include <string>
 #include <utility>
@@ -31,7 +29,12 @@ public:
     bool valid() const { return window != nullptr; }
 
 public:
-    bool resize(int, int);
+    SDL_Window *get_window() const { return window; }
+    void set_window(SDL_Window *w) { window = w; }
+
+public:
+    bool
+    resize(int, int);
     std::pair<int, int> get_size();
 
     bool set_position(int, int);
