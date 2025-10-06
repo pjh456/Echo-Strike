@@ -18,6 +18,7 @@ private:
     SDL_Window *window = nullptr;
 
 public:
+    Window(SDL_Window *);
     Window(const std::string &, int, int, uint32_t = 0);
     Window();
     ~Window();

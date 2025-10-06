@@ -2,12 +2,17 @@
 
 #include <SDL3/SDL_video.h>
 
+Window::Window(SDL_Window *w)
+    : window(w)
+{
+}
+
 Window::Window(
     const std::string &title,
     int width,
     int height,
     uint32_t flags)
-    : window(SDL_CreateWindow(title.c_str(), width, height, flags))
+    : Window(SDL_CreateWindow(title.c_str(), width, height, flags))
 {
 }
 
