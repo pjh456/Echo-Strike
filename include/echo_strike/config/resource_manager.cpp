@@ -27,9 +27,10 @@ std::shared_ptr<std::string> ResourceManager::load_resource_str(const std::files
     if (!is_file(abs_path))
         return nullptr;
 
-    auto it = m_cache.find(abs_path.u8string());
+    auto key = normalize_key(abs_path);
+    auto it = m_cache.find(key);
     if (it != m_cache.end())
-        return get<std::string>(abs_path.u8string());
+        return get<std::string>(key);
 
     std::ifstream ifs(abs_path, std::ios::binary);
     if (!ifs)
@@ -39,28 +40,16 @@ std::shared_ptr<std::string> ResourceManager::load_resource_str(const std::files
         std::istreambuf_iterator<char>(ifs),
         std::istreambuf_iterator<char>());
 
-    store<std::string>(abs_path.u8string(), str_ptr);
+    store<std::string>(key, str_ptr);
 
     return str_ptr;
 }
 
-std::shared_ptr<std::string> ResourceManager::load_resource_str(const std::u8string &path)
-{
-    namespace fs = std::filesystem;
-    return load_resource_str(fs::path(path));
-}
-
 void ResourceManager::destroy_resource(const std::filesystem::path &path)
 {
-    auto it = m_cache.find(path.u8string());
+    auto it = m_cache.find(normalize_key(path));
     if (it != m_cache.end())
         m_cache.erase(it);
-}
-
-void ResourceManager::destroy_resource(const std::u8string &path)
-{
-    namespace fs = std::filesystem;
-    return destroy_resource(fs::path(path));
 }
 
 void ResourceManager::destroy_resource(void *ptr)
@@ -97,21 +86,14 @@ std::shared_ptr<Image> ResourceManager::load_texture(
     return img;
 }
 
-std::shared_ptr<Image> ResourceManager::load_texture(
-    SDL_Renderer *renderer,
-    const std::u8string &path)
-{
-    namespace fs = std::filesystem;
-    return load_texture(renderer, fs::path(path));
-}
-
 std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_textures(
     SDL_Renderer *renderer,
     const char *template_str,
     size_t counts)
 {
-    auto abs_path = absolute_path(template_str).parent_path();
-    auto it = m_atlases.find(abs_path.u8string());
+    auto abs_path = absolute_path(std::filesystem::u8path(template_str)).parent_path();
+    auto key = normalize_key(abs_path);
+    auto it = m_atlases.find(key);
     if (it != m_atlases.end())
         return {it->second->size(), it->second};
 
@@ -135,10 +117,10 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_textures(
     }
 
     auto ptr = std::make_shared<Atlas>(std::move(textures));
-    m_atlases.insert({abs_path.u8string(), ptr});
+    m_atlases.insert({key, ptr});
 
-    auto u8_atlas_name = relative_path_str(abs_path, abs_path.parent_path());
-    std::string atlas_name = std::format("{}", std::string(u8_atlas_name.begin(), u8_atlas_name.end()));
+    auto u8_atlas_name = relative_path(abs_path, abs_path.parent_path()).u8string();
+    std::string atlas_name(reinterpret_cast<const char *>(u8_atlas_name.c_str()), u8_atlas_name.size());
     ptr->set_name(atlas_name);
     return {success_count, ptr};
 }
@@ -172,13 +154,13 @@ std::vector<std::shared_ptr<Atlas>> ResourceManager::load_texture_folder(
 
         const auto &subfolder = entry.path();
 
-        auto subfolder_str = subfolder.u8string();
+        auto subfolder_str = subfolder.string();
         auto full_subpath = subfolder / template_str;
-        auto full_template = full_subpath.u8string();
-        auto full_template_str = std::string(full_template.begin(), full_template.end());
+        auto full_template_str = full_subpath.u8string();
+        std::string full_template_std_str(reinterpret_cast<const char *>(full_template_str.c_str()), full_template_str.size());
 
         // 调用 load_textures 自动加载 Atlas
-        auto [count, atlas] = load_textures(renderer, full_template_str.c_str(), 0);
+        auto [count, atlas] = load_textures(renderer, full_template_std_str.c_str(), 0);
 
         if (count > 0)
             atlases.push_back(atlas);
@@ -201,22 +183,10 @@ bool ResourceManager::set_resource_folder(const std::filesystem::path &path)
     return true;
 }
 
-bool ResourceManager::set_resource_folder(const std::u8string &path)
-{
-    namespace fs = std::filesystem;
-    return set_resource_folder(fs::path(path));
-}
-
 bool ResourceManager::is_exist(const std::filesystem::path &path) const
 {
     namespace fs = std::filesystem;
     return fs::exists(path);
-}
-
-bool ResourceManager::is_exist(const std::u8string &path) const
-{
-    namespace fs = std::filesystem;
-    return is_exist(fs::path(path));
 }
 
 bool ResourceManager::is_file(const std::filesystem::path &path) const
@@ -225,34 +195,16 @@ bool ResourceManager::is_file(const std::filesystem::path &path) const
     return fs::is_regular_file(path);
 }
 
-bool ResourceManager::is_file(const std::u8string &path) const
-{
-    namespace fs = std::filesystem;
-    return is_file(fs::path(path));
-}
-
 bool ResourceManager::is_directory(const std::filesystem::path &path) const
 {
     namespace fs = std::filesystem;
     return fs::is_directory(path);
 }
 
-bool ResourceManager::is_directory(const std::u8string &path) const
-{
-    namespace fs = std::filesystem;
-    return is_directory(fs::path(path));
-}
-
 std::filesystem::path ResourceManager::absolute_path(const std::filesystem::path &path) const
 {
     namespace fs = std::filesystem;
     return fs::absolute(path);
-}
-
-std::filesystem::path ResourceManager::absolute_path(const std::u8string &path) const
-{
-    namespace fs = std::filesystem;
-    return absolute_path(fs::path(path));
 }
 
 std::filesystem::path ResourceManager::relative_path(
@@ -263,40 +215,48 @@ std::filesystem::path ResourceManager::relative_path(
     return fs::relative(path, base);
 }
 
-std::filesystem::path ResourceManager::relative_path(
-    const std::u8string &path,
-    const std::u8string &base) const
+std::string ResourceManager::absolute_path_str(const std::filesystem::path &path) const
 {
-    namespace fs = std::filesystem;
-    return relative_path(fs::path(path), fs::path(base));
+    return normalize_key(absolute_path(path));
 }
 
-std::u8string ResourceManager::absolute_path_str(const std::filesystem::path &path) const
-{
-    return absolute_path(path).u8string();
-}
-
-std::u8string ResourceManager::absolute_path_str(const std::u8string &path) const
-{
-    return absolute_path(path).u8string();
-}
-
-std::u8string ResourceManager::relative_path_str(
+std::string ResourceManager::relative_path_str(
     const std::filesystem::path &path,
     const std::filesystem::path &base) const
 {
-    return relative_path(path, base).u8string();
+    return normalize_key(relative_path(path, base));
 }
 
-std::u8string ResourceManager::relative_path_str(const std::u8string &path, const std::u8string &base) const
+std::shared_ptr<Atlas> ResourceManager::get_atlas(const KeyType &name) const
 {
-    return relative_path(path, base).u8string();
-}
+    auto it = std::find_if(
+        m_atlases.begin(),
+        m_atlases.end(),
+        [&](const auto &pair)
+        {
+            return pair.second->get_name() == name;
+        });
 
-std::shared_ptr<Atlas> ResourceManager::get_atlas(const KeyType &key) const
-{
-    auto it = m_atlases.find(key);
     if (it == m_atlases.end())
         return nullptr;
     return it->second;
+}
+
+inline std::string ResourceManager::normalize_key(const std::filesystem::path &path)
+{
+    namespace fs = std::filesystem;
+    // 先获取词法规范的绝对路径
+    auto abs_path = fs::absolute(path).lexically_normal();
+
+    // 将路径转换为UTF-8编码的字符串
+    std::u8string u8str = abs_path.u8string();
+
+    // 将std::u8string转换为std::string以便用作key
+    // C++20可以直接转换
+    std::string result(reinterpret_cast<const char *>(u8str.c_str()), u8str.size());
+
+    // 将所有反斜杠'\'替换为斜杠'/'，确保格式统一
+    std::replace(result.begin(), result.end(), '\\', '/');
+
+    return result;
 }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <echo_strike/image/animation.hpp>
+#include <echo_strike/config/resource_manager.hpp>
 
 #include <SDL3/SDL.h>
 #include <SDL3_image/SDL_image.h>
@@ -10,12 +11,20 @@ int main()
 {
     SDL_Init(SDL_INIT_VIDEO);
 
-    Atlas atlas;
+    Atlas *atlas;
     auto window = SDL_CreateWindow("atlas test", 800, 600, SDL_WINDOW_RESIZABLE);
     auto renderer = SDL_CreateRenderer(window, NULL);
-    std::cout << atlas.load(renderer, "E:/Projects/games/echo strike/resources/enemy/aim/{}.png", 10) << std::endl;
+    auto &manager = ResourceManager::instance();
+
+    manager.load_texture_folder(
+        renderer,
+        "E:/Projects/games/echo strike/resources",
+        "{}.png");
+
+    atlas = ResourceManager::instance().get_atlas("aim").get();
+    // std::cout << atlas.load(renderer, "E:/Projects/games/echo strike/resources/enemy/aim/{}.png", 10) << std::endl;
     Animation animation(50);
-    animation.add_frames(atlas);
+    animation.add_frames(*atlas);
 
     auto now = std::chrono::high_resolution_clock::now();
 
