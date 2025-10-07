@@ -18,7 +18,13 @@ struct Color
         color.A = enable_alpha ? rand() % 256 : 255;
         return color;
     }
-    Color() : R(0), G(0), B(0), A(255) {}
+
+    Color(int r, int g, int b, int a = 255)
+        : R(r), G(g), B(b), A(a)
+    {
+    }
+
+    Color(int a = 255) : Color(0, 0, 0, a) {}
 
     DEFAULT_CONSTRUCTOR(Color)
     DEFAULT_EQUAL_OPERATOR(Color)
