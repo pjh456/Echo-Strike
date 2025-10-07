@@ -33,7 +33,7 @@ private:
 
     CLASS_PROPERTY(CollisionLayer, src)
 
-    CLASS_POINTER(Object, object)
+    Object *m_object;
 
 private:
     CollisionBox();
@@ -64,6 +64,14 @@ public:
 
     Rect get_rect() const { return m_rect; }
     void set_rect(const Rect &rect);
+
+    Object *get_object() const { return m_object; }
+    void set_object(Object *obj)
+    {
+        if (m_object)
+            delete m_object;
+        m_object = obj;
+    }
 };
 
 #endif // INCLUDE_COLLISION_BOX

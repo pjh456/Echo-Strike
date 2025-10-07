@@ -24,8 +24,8 @@ protected:
     Status stus;
     StateMachine anim_sm;
 
-    CLASS_POINTER(CollisionBox, hit_box)
-    CLASS_POINTER(CollisionBox, hurt_box)
+    CollisionBox *m_hit_box;
+    CollisionBox *m_hurt_box;
 
 public:
     Entity();
@@ -88,6 +88,13 @@ protected:
         if (m_rect.right() >= WIDTH)
             m_rect.set_x(WIDTH - m_rect.get_width());
     }
+
+public:
+    CollisionBox *get_hit_box() const { return m_hit_box; }
+    void set_hit_box(CollisionBox *box) { m_hit_box = box; }
+
+    CollisionBox *get_hurt_box() const { return m_hurt_box; }
+    CollisionBox *set_hurt_box(CollisionBox *box);
 };
 
 #endif // INCLUDE_ENTITY

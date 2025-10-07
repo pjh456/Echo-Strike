@@ -12,19 +12,6 @@ public:                                     \
     CLASS_READONLY_PROPERTY(type, name) \
     void set_##name(const type &p_##name) noexcept { m_##name = p_##name; }
 
-#define CLASS_POINTER(type, name)                          \
-protected:                                                 \
-    type *m_##name;                                        \
-                                                           \
-public:                                                    \
-    type *get_##name() const noexcept { return m_##name; } \
-    void set_##name(type *p_##name)                        \
-    {                                                      \
-        if (m_##name != nullptr)                           \
-            delete m_##name;                               \
-        m_##name = p_##name;                               \
-    }
-
 #define CLASS_REFERENCE(type, name)                  \
 protected:                                           \
     type &m_##name;                                  \

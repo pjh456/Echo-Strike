@@ -14,3 +14,10 @@ Entity::~Entity()
     CollisionManager::instance().destroy_collision_box(m_hit_box);
     CollisionManager::instance().destroy_collision_box(m_hurt_box);
 }
+
+CollisionBox *Entity::set_hurt_box(CollisionBox *box)
+{
+    if (m_hurt_box)
+        CollisionManager::instance().destroy_collision_box(m_hurt_box);
+    m_hurt_box = box;
+}
