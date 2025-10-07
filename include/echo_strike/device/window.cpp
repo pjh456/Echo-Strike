@@ -1,5 +1,7 @@
 #include <echo_strike/device/window.hpp>
 
+#include <echo_strike/device/renderer.hpp>
+
 #include <SDL3/SDL_video.h>
 
 Window::Window(SDL_Window *w)
@@ -92,6 +94,11 @@ uint32_t Window::get_flags()
     if (!window)
         return 0;
     return SDL_GetWindowFlags(window);
+}
+
+RendererBuilder Window::create_renderer()
+{
+    return Renderer::create().set_window(*this);
 }
 
 WindowBuilder &WindowBuilder::resizable(bool flag)

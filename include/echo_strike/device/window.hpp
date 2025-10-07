@@ -7,12 +7,15 @@
 
 struct SDL_Window;
 
+class Renderer;
+class RendererBuilder;
 class WindowBuilder;
 
 class Window
 {
 public:
     static WindowBuilder create();
+    RendererBuilder create_renderer();
 
 private:
     SDL_Window *window = nullptr;
@@ -30,8 +33,8 @@ public:
     bool valid() const { return window != nullptr; }
 
 public:
-    SDL_Window *get_window() const { return window; }
-    void set_window(SDL_Window *w) { window = w; }
+    SDL_Window *get_raw() const { return window; }
+    void set_raw(SDL_Window *w) { window = w; }
 
 public:
     bool
