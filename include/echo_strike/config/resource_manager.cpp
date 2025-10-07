@@ -27,7 +27,7 @@ std::shared_ptr<std::string> ResourceManager::load_resource_str(const std::files
     if (!is_file(abs_path))
         return nullptr;
 
-    auto key = normalize_key(abs_path);
+    auto key = normalize_key(remove_prefix(abs_path));
     auto it = m_cache.find(key);
     if (it != m_cache.end())
         return get<std::string>(key);
@@ -71,7 +71,7 @@ std::shared_ptr<Image> ResourceManager::load_image(
     if (!is_file(path))
         return nullptr;
 
-    auto key = absolute_path_str(path);
+    auto key = normalize_key(remove_prefix(path));
     if (auto cached = get<Image>(key))
         return cached;
 
@@ -90,8 +90,14 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_atlas(
     const char *template_str,
     size_t counts)
 {
+    auto rel_key = normalize_key(std::filesystem::u8path(template_str).parent_path());
+    auto rel_it = m_atlases.find(rel_key);
+    if (rel_it != m_atlases.end())
+        return {rel_it->second->size(), rel_it->second};
+
     auto abs_path = absolute_path(std::filesystem::u8path(template_str)).parent_path();
-    auto key = normalize_key(abs_path);
+    auto key = normalize_key(remove_prefix(abs_path));
+
     auto it = m_atlases.find(key);
     if (it != m_atlases.end())
         return {it->second->size(), it->second};
@@ -116,11 +122,12 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_atlas(
     }
 
     auto ptr = std::make_shared<Atlas>(std::move(images));
-    m_atlases.insert({key, ptr});
+    if (ptr->size() > 0)
+        m_atlases.insert({key, ptr});
 
-    auto u8_atlas_name = relative_path(abs_path, abs_path.parent_path()).u8string();
-    std::string atlas_name(reinterpret_cast<const char *>(u8_atlas_name.c_str()), u8_atlas_name.size());
-    ptr->set_name(atlas_name);
+    // auto u8_atlas_name = key;
+    // std::string atlas_name(reinterpret_cast<const char *>(u8_atlas_name.c_str()), u8_atlas_name.size());
+    ptr->set_name(key);
     return {success_count, ptr};
 }
 
@@ -132,6 +139,7 @@ std::vector<std::shared_ptr<Atlas>> ResourceManager::load_atlases(
     namespace fs = std::filesystem;
     std::vector<std::shared_ptr<Atlas>> atlases;
 
+    m_folder = folder_path;
     auto full_path = absolute_path(folder_path);
 
     if (!is_directory(full_path))
@@ -240,20 +248,40 @@ std::shared_ptr<Atlas> ResourceManager::get_atlas(const KeyType &name) const
     return it->second;
 }
 
+inline std::filesystem::path
+ResourceManager::
+    remove_prefix(const std::filesystem::path &path)
+{
+    namespace fs = std::filesystem;
+
+    auto abs_path = absolute_path(path).lexically_normal();
+    auto folder = absolute_path(m_folder).lexically_normal();
+
+    fs::path rel_path;
+    auto it_abs = abs_path.begin();
+    auto it_folder = folder.begin();
+    while (it_abs != abs_path.end() && it_folder != folder.end() && *it_abs == *it_folder)
+    {
+        ++it_abs;
+        ++it_folder;
+    }
+    for (; it_abs != abs_path.end(); ++it_abs)
+    {
+        rel_path /= *it_abs;
+    }
+
+    return rel_path;
+}
+
 inline std::string ResourceManager::normalize_key(const std::filesystem::path &path)
 {
     namespace fs = std::filesystem;
-    // 先获取词法规范的绝对路径
-    auto abs_path = fs::absolute(path).lexically_normal();
+    auto normal_path = path.lexically_normal();
 
-    // 将路径转换为UTF-8编码的字符串
-    std::u8string u8str = abs_path.u8string();
+    std::u8string u8str = normal_path.u8string();
 
-    // 将std::u8string转换为std::string以便用作key
-    // C++20可以直接转换
     std::string result(reinterpret_cast<const char *>(u8str.c_str()), u8str.size());
 
-    // 将所有反斜杠'\'替换为斜杠'/'，确保格式统一
     std::replace(result.begin(), result.end(), '\\', '/');
 
     return result;

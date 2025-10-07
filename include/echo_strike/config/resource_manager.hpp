@@ -109,12 +109,13 @@ public:
     }
 
 private:
+    inline std::filesystem::path
+    remove_prefix(const std::filesystem::path &);
+
     inline static std::string normalize_key(const std::filesystem::path &path);
 
-    // 这个重载函数也保持不变，它会调用上面的版本
     inline static std::string normalize_key(const std::string &str)
     {
-        // 使用u8path从UTF-8字符串构造path对象，避免编码问题
         return normalize_key(std::filesystem::u8path(str));
     }
 };
