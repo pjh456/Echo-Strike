@@ -16,7 +16,7 @@ int main()
     auto renderer = SDL_CreateRenderer(window, NULL);
     auto &manager = ResourceManager::instance();
 
-    manager.load_texture_folder(
+    manager.load_atlases(
         renderer,
         "E:/Projects/games/echo strike/resources",
         "{}.png");

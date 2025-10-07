@@ -44,7 +44,20 @@ public:
 public:
     virtual void on_update(float delta)
     {
+        Object::on_update(delta);
         anim_sm.on_update(delta);
+    }
+
+    virtual void render(SDL_Renderer *renderer)
+    {
+        auto raw_ptr = anim_sm.get_current_state();
+        if (!raw_ptr)
+            return;
+
+        if (auto it = dynamic_cast<EntityState *>(raw_ptr))
+        {
+            it->get_anim().render(renderer);
+        }
     }
 
     virtual void on_hurt(Entity *) {}
