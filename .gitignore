@@ -6,3 +6,4 @@ include/SDL_ttf
 include/SDL_mixer
 include/pjh_json
 resources
+resources_copy

@@ -1,0 +1,64 @@
+{
+    "sprite_cut": {
+        "ui_heart.png": {
+            "rows": 1,
+            "cols": 1
+        },
+        "background.png": {
+            "rows": 1,
+            "cols": 1
+        },
+        "player/attack.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/dead.png": {
+            "rows": 1,
+            "cols": 6
+        },
+        "player/fall.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/idle.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/jump.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/roll.png": {
+            "rows": 1,
+            "cols": 7
+        },
+        "player/run.png": {
+            "rows": 1,
+            "cols": 10
+        },
+        "player/vfx_attack_down.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/vfx_attack_left.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/vfx_attack_right.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/vfx_attack_up.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/vfx_jump.png": {
+            "rows": 1,
+            "cols": 5
+        },
+        "player/vfx_land.png": {
+            "rows": 1,
+            "cols": 2
+        }
+    }
+}
