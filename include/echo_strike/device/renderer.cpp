@@ -5,7 +5,6 @@
 #include <echo_strike/utils/rect.hpp>
 
 #include <SDL3/SDL_render.h>
-#include <SDL3/SDL_blendmode.h>
 #include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_video.h>
 
@@ -14,26 +13,6 @@ enum class Renderer::VSyncMode : int
     Disabled = SDL_RENDERER_VSYNC_DISABLED,
     Enabled = 1,
     Adaptive = SDL_RENDERER_VSYNC_ADAPTIVE
-};
-
-enum class Renderer::BlendMode : uint32_t
-{
-    None = SDL_BLENDMODE_NONE,
-    Blend = SDL_BLENDMODE_BLEND,
-    BlendPremutiplied = SDL_BLENDMODE_BLEND_PREMULTIPLIED,
-    Add = SDL_BLENDMODE_ADD,
-    AddPremutiplied = SDL_BLENDMODE_ADD_PREMULTIPLIED,
-    Mod = SDL_BLENDMODE_MOD,
-    Mul = SDL_BLENDMODE_MUL,
-    Invalid = SDL_BLENDMODE_INVALID
-};
-
-enum class Renderer::FlipMode : int
-{
-    None = SDL_FLIP_NONE,
-    Horizontal = SDL_FLIP_HORIZONTAL,
-    Vertical = SDL_FLIP_VERTICAL,
-    HorizontalAndVectical = SDL_FLIP_HORIZONTAL_AND_VERTICAL
 };
 
 // enum class Renderer::ScaleMode : int
@@ -220,7 +199,7 @@ bool Renderer::set_vsync_mode(VSyncMode flag)
     return SDL_SetRenderVSync(renderer, static_cast<int>(flag));
 }
 
-Renderer::BlendMode Renderer::get_blend_mode() const
+BlendMode Renderer::get_blend_mode() const
 {
     SDL_BlendMode flag;
     SDL_GetRenderDrawBlendMode(renderer, &flag);

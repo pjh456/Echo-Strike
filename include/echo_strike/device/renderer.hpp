@@ -2,6 +2,8 @@
 #define INCLUDE_RENDERER
 
 #include <echo_strike/utils/color.hpp>
+#include <echo_strike/device/blend_mode.hpp>
+#include <echo_strike/device/flip_mode.hpp>
 
 #include <cstdint>
 #include <utility>
@@ -21,8 +23,6 @@ public:
     static RendererBuilder create();
 
     enum class VSyncMode : int;
-    enum class BlendMode : uint32_t;
-    enum class FlipMode : int;
     // enum class ScaleMode : int;
     // enum class LogicalOp : int;
     // enum class RendererLogicalPresentation : int;
@@ -76,6 +76,10 @@ public:
 
     BlendMode get_blend_mode() const;
     bool set_blend_mode(BlendMode);
+
+public:
+    SDL_Renderer *get_raw() const { return renderer; }
+    void set_raw(SDL_Renderer *r) { renderer = r; }
 };
 
 class RendererBuilder
