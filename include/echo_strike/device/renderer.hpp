@@ -1,9 +1,11 @@
 #ifndef INCLUDE_RENDERER
 #define INCLUDE_RENDERER
 
-#include <echo_strike/utils/color.hpp>
 #include <echo_strike/device/blend_mode.hpp>
 #include <echo_strike/device/flip_mode.hpp>
+#include <echo_strike/utils/color.hpp>
+#include <echo_strike/utils/vec2.hpp>
+#include <echo_strike/utils/rect.hpp>
 
 #include <cstdint>
 #include <utility>
@@ -12,8 +14,6 @@ struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Window;
 
-class Vec2;
-class Rect;
 class Window;
 class RendererBuilder;
 

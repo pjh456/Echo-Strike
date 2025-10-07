@@ -1,8 +1,6 @@
 #include <echo_strike/device/renderer.hpp>
 
 #include <echo_strike/device/window.hpp>
-#include <echo_strike/utils/vec2.hpp>
-#include <echo_strike/utils/rect.hpp>
 
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_surface.h>
