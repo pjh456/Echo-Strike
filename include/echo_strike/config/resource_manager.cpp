@@ -71,9 +71,9 @@ std::shared_ptr<Image> ResourceManager::load_image(
     if (!is_file(path))
         return nullptr;
 
-    auto key = normalize_key(remove_prefix(path));
-    if (auto cached = get<Image>(key))
-        return cached;
+    auto [key, cache] = load_cache<Image>(path);
+    if (cache)
+        return cache;
 
     auto raw = IMG_LoadTexture(renderer, path.string().c_str());
     if (!raw)
@@ -90,17 +90,10 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_atlas(
     const char *template_str,
     size_t counts)
 {
-    auto rel_key = normalize_key(std::filesystem::u8path(template_str).parent_path());
-    auto rel_it = m_atlases.find(rel_key);
-    if (rel_it != m_atlases.end())
-        return {rel_it->second->size(), rel_it->second};
-
-    auto abs_path = absolute_path(std::filesystem::u8path(template_str)).parent_path();
-    auto key = normalize_key(remove_prefix(abs_path));
-
-    auto it = m_atlases.find(key);
-    if (it != m_atlases.end())
-        return {it->second->size(), it->second};
+    auto temp_path = std::filesystem::u8path(template_str).parent_path();
+    auto [key, cache] = load_atlas_cache(temp_path);
+    if (cache)
+        return {cache->size(), cache};
 
     size_t success_count = 0;
     std::vector<Image> images;
@@ -130,6 +123,28 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_atlas(
     ptr->set_name(key);
     return {success_count, ptr};
 }
+
+// std::tuple<size_t, std::shared_ptr<Atlas>>
+// ResourceManager::
+//     load_atlas(
+//         SDL_Renderer *renderer,
+//         const std::filesystem::path &path,
+//         int rols,
+//         int cols)
+// {
+//     auto rel_key = normalize_key(path);
+//     auto rel_it = m_atlases.find(rel_key);
+//     if (rel_it != m_atlases.end())
+//         return {rel_it->second->size(), rel_it->second};
+
+//     auto abs_path = absolute_path(path);
+//     auto key = normalize_key(remove_prefix(abs_path));
+//     auto it = m_atlases.find(key);
+//     if (it != m_atlases.end())
+//         return {it->second->size(), it->second};
+
+//     auto img = load_image(renderer, abs_path);
+// }
 
 std::vector<std::shared_ptr<Atlas>> ResourceManager::load_atlases(
     SDL_Renderer *renderer,

@@ -37,6 +37,8 @@ public:
     load_image(SDL_Renderer *, const std::filesystem::path &);
     std::tuple<size_t, std::shared_ptr<Atlas>>
     load_atlas(SDL_Renderer *, const char *, size_t = 0);
+    // std::tuple<size_t, std::shared_ptr<Atlas>>
+    // load_atlas(SDL_Renderer *, const std::filesystem::path &, int, int);
     std::vector<std::shared_ptr<Atlas>>
     load_atlases(SDL_Renderer *, const std::filesystem::path &, const char *);
 
@@ -108,13 +110,51 @@ public:
         return std::static_pointer_cast<T>(cache_it->second);
     }
 
-private:
+    template <typename T>
+    inline std::tuple<
+        KeyType,
+        std::shared_ptr<T>>
+    load_cache(const std::filesystem::path &path)
+    {
+        auto rel_key = normalize_key(path);
+        if (auto cached = get<T>(rel_key))
+            return {rel_key, cached};
+
+        auto abs_path = absolute_path(path);
+        auto abs_key = normalize_key(remove_prefix(abs_path));
+        if (auto cached = get<T>(abs_key))
+            return {abs_key, cached};
+
+        return {abs_key, nullptr};
+    }
+
+    inline std::tuple<
+        KeyType, std::shared_ptr<Atlas>>
+    load_atlas_cache(const std::filesystem::path &path)
+    {
+        auto rel_key = normalize_key(path);
+        auto rel_it = m_atlases.find(rel_key);
+        if (rel_it != m_atlases.end())
+            return {rel_key, rel_it->second};
+
+        auto abs_path = absolute_path(path);
+        auto abs_key = normalize_key(remove_prefix(abs_path));
+        auto abs_it = m_atlases.find(abs_key);
+        if (abs_it != m_atlases.end())
+            return {abs_key, abs_it->second};
+
+        return {abs_key, nullptr};
+    }
+
+public:
     inline std::filesystem::path
     remove_prefix(const std::filesystem::path &);
 
-    inline static std::string normalize_key(const std::filesystem::path &path);
+    inline static std::string
+    normalize_key(const std::filesystem::path &path);
 
-    inline static std::string normalize_key(const std::string &str)
+    inline static std::string
+    normalize_key(const std::string &str)
     {
         return normalize_key(std::filesystem::u8path(str));
     }

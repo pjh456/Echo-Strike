@@ -40,6 +40,11 @@ int main()
         "enemy/aim/{}.png");
     std::cout << "Loaded Atlas's name: " << atlas->get_name() << std::endl;
 
+    auto [key, cache] = manager.load_atlas_cache("enemy/aim");
+    std::cout << "Get cache " << key << " : "
+              << (cache ? "Yes" : "No")
+              << std::endl;
+
     Animation animation(50);
     animation.add_frames(*atlas);
 
