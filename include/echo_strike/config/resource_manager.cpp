@@ -64,15 +64,14 @@ void ResourceManager::destroy_resource(void *ptr)
         m_cache.erase(it);
 }
 
-std::shared_ptr<Image> ResourceManager::load_texture(
+std::shared_ptr<Image> ResourceManager::load_image(
     SDL_Renderer *renderer,
     const std::filesystem::path &path)
 {
-    auto key = absolute_path_str(path);
-
     if (!is_file(path))
         return nullptr;
 
+    auto key = absolute_path_str(path);
     if (auto cached = get<Image>(key))
         return cached;
 
@@ -86,7 +85,7 @@ std::shared_ptr<Image> ResourceManager::load_texture(
     return img;
 }
 
-std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_textures(
+std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_atlas(
     SDL_Renderer *renderer,
     const char *template_str,
     size_t counts)
@@ -98,25 +97,25 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_textures(
         return {it->second->size(), it->second};
 
     size_t success_count = 0;
-    std::vector<Image> textures;
+    std::vector<Image> images;
 
     for (size_t idx = 0;
          counts == 0 ? true : idx < counts;
          ++idx)
     {
         auto fmt_path = std::vformat(template_str, std::make_format_args(idx));
-        auto tex_ptr = load_texture(renderer, fmt_path);
+        auto img_ptr = load_image(renderer, fmt_path);
 
-        if (tex_ptr.get() != nullptr)
+        if (img_ptr.get() != nullptr)
         {
             success_count++;
-            textures.push_back(std::move(*tex_ptr.get()));
+            images.push_back(std::move(*img_ptr.get()));
         }
         else if (idx != 0)
             break;
     }
 
-    auto ptr = std::make_shared<Atlas>(std::move(textures));
+    auto ptr = std::make_shared<Atlas>(std::move(images));
     m_atlases.insert({key, ptr});
 
     auto u8_atlas_name = relative_path(abs_path, abs_path.parent_path()).u8string();
@@ -125,7 +124,7 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_textures(
     return {success_count, ptr};
 }
 
-std::vector<std::shared_ptr<Atlas>> ResourceManager::load_texture_folder(
+std::vector<std::shared_ptr<Atlas>> ResourceManager::load_atlases(
     SDL_Renderer *renderer,
     const std::filesystem::path &folder_path,
     const char *template_str)
@@ -159,8 +158,7 @@ std::vector<std::shared_ptr<Atlas>> ResourceManager::load_texture_folder(
         auto full_template_str = full_subpath.u8string();
         std::string full_template_std_str(reinterpret_cast<const char *>(full_template_str.c_str()), full_template_str.size());
 
-        // 调用 load_textures 自动加载 Atlas
-        auto [count, atlas] = load_textures(renderer, full_template_std_str.c_str(), 0);
+        auto [count, atlas] = load_atlas(renderer, full_template_std_str.c_str(), 0);
 
         if (count > 0)
             atlases.push_back(atlas);

@@ -14,6 +14,7 @@ struct SDL_Renderer;
 
 class Image;
 class Atlas;
+class Renderer;
 
 class ResourceManager
 {
@@ -32,9 +33,12 @@ public:
     void destroy_resource(void *);
 
 public:
-    std::shared_ptr<Image> load_texture(SDL_Renderer *, const std::filesystem::path &);
-    std::tuple<size_t, std::shared_ptr<Atlas>> load_textures(SDL_Renderer *, const char *, size_t = 0);
-    std::vector<std::shared_ptr<Atlas>> load_texture_folder(SDL_Renderer *, const std::filesystem::path &, const char *);
+    std::shared_ptr<Image>
+    load_image(SDL_Renderer *, const std::filesystem::path &);
+    std::tuple<size_t, std::shared_ptr<Atlas>>
+    load_atlas(SDL_Renderer *, const char *, size_t = 0);
+    std::vector<std::shared_ptr<Atlas>>
+    load_atlases(SDL_Renderer *, const std::filesystem::path &, const char *);
 
 private:
     std::filesystem::path m_folder;
@@ -60,14 +64,14 @@ public:
 
 public:
     std::filesystem::path absolute_path(const std::filesystem::path &) const;
-
-    std::filesystem::path relative_path(
-        const std::filesystem::path &,
-        const std::filesystem::path & = std::filesystem::current_path()) const;
-
     std::string absolute_path_str(const std::filesystem::path &) const;
 
-    std::string relative_path_str(
+    std::filesystem::path
+    relative_path(
+        const std::filesystem::path &,
+        const std::filesystem::path & = std::filesystem::current_path()) const;
+    std::string
+    relative_path_str(
         const std::filesystem::path &,
         const std::filesystem::path & = std::filesystem::current_path()) const;
 
@@ -77,7 +81,6 @@ public:
 
     AtlasPool &get_atlases() { return m_atlases; }
     const AtlasPool &get_atlases() const { return m_atlases; }
-
     std::shared_ptr<Atlas> get_atlas(const KeyType &) const;
 
 public:

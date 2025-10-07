@@ -22,7 +22,7 @@ int main()
     auto renderer = SDL_CreateRenderer(window, NULL);
 
     auto dir = std::filesystem::path("E:/Projects/games/echo strike/resources");
-    auto atlases = manager.load_texture_folder(
+    auto atlases = manager.load_atlases(
         renderer,
         dir,
         "{}.png");
@@ -34,7 +34,7 @@ int main()
     for (auto atlas : atlases)
         std::cout << "Atlas name: " << atlas->get_name() << std::endl;
 
-    auto [count, atlas] = manager.load_textures(
+    auto [count, atlas] = manager.load_atlas(
         renderer,
         "../resources/enemy/aim/{}.png");
     std::cout << "Loaded Atlas's name: " << atlas->get_name() << std::endl;
