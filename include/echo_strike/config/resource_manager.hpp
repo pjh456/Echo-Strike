@@ -37,8 +37,8 @@ public:
     load_image(SDL_Renderer *, const std::filesystem::path &);
     std::tuple<size_t, std::shared_ptr<Atlas>>
     load_atlas(SDL_Renderer *, const char *, size_t = 0);
-    // std::tuple<size_t, std::shared_ptr<Atlas>>
-    // load_atlas(SDL_Renderer *, const std::filesystem::path &, int, int);
+    std::tuple<size_t, std::shared_ptr<Atlas>>
+    load_atlas(SDL_Renderer *, const std::filesystem::path &, int, int);
     std::vector<std::shared_ptr<Atlas>>
     load_atlases(SDL_Renderer *, const std::filesystem::path &, const char *);
 

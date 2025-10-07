@@ -2,6 +2,7 @@
 
 #include <echo_strike/image/image.hpp>
 #include <echo_strike/image/atlas.hpp>
+#include <echo_strike/config/config_manager.hpp>
 
 #include <fstream>
 #include <algorithm>
@@ -124,27 +125,53 @@ std::tuple<size_t, std::shared_ptr<Atlas>> ResourceManager::load_atlas(
     return {success_count, ptr};
 }
 
-// std::tuple<size_t, std::shared_ptr<Atlas>>
-// ResourceManager::
-//     load_atlas(
-//         SDL_Renderer *renderer,
-//         const std::filesystem::path &path,
-//         int rols,
-//         int cols)
-// {
-//     auto rel_key = normalize_key(path);
-//     auto rel_it = m_atlases.find(rel_key);
-//     if (rel_it != m_atlases.end())
-//         return {rel_it->second->size(), rel_it->second};
+std::tuple<size_t, std::shared_ptr<Atlas>>
+ResourceManager::
+    load_atlas(
+        SDL_Renderer *renderer,
+        const std::filesystem::path &path,
+        int rows,
+        int cols)
+{
+    auto [key, cache] = load_atlas_cache(path);
+    if (cache)
+        return {cache->size(), cache};
 
-//     auto abs_path = absolute_path(path);
-//     auto key = normalize_key(remove_prefix(abs_path));
-//     auto it = m_atlases.find(key);
-//     if (it != m_atlases.end())
-//         return {it->second->size(), it->second};
+    auto image = load_image(renderer, path);
+    if (!image)
+        return {0, nullptr};
 
-//     auto img = load_image(renderer, abs_path);
-// }
+    int frame_w = image->get_width() / cols;
+    int frame_h = image->get_height() / rows;
+    auto tex = image->get_texture();
+
+    std::vector<Image> frames;
+    for (int r = 0; r < rows; ++r)
+    {
+        for (int c = 0; c < cols; ++c)
+        {
+            SDL_FRect frect{c * frame_w, r * frame_h, frame_w, frame_h};
+            SDL_Texture *sub_tex =
+                SDL_CreateTexture(
+                    renderer,
+                    SDL_PIXELFORMAT_RGBA32,
+                    SDL_TEXTUREACCESS_TARGET,
+                    frame_w, frame_h);
+
+            SDL_SetRenderTarget(renderer, sub_tex);
+            SDL_RenderTexture(renderer, tex, &frect, nullptr);
+            SDL_SetRenderTarget(renderer, nullptr);
+            frames.emplace_back(sub_tex);
+        }
+    }
+
+    auto ptr = std::make_shared<Atlas>(std::move(frames));
+    if (ptr->size() > 0)
+        m_atlases.insert({key, ptr});
+
+    ptr->set_name(key);
+    return {ptr->size(), ptr};
+}
 
 std::vector<std::shared_ptr<Atlas>> ResourceManager::load_atlases(
     SDL_Renderer *renderer,
@@ -162,29 +189,57 @@ std::vector<std::shared_ptr<Atlas>> ResourceManager::load_atlases(
 
     std::vector<fs::directory_entry> dirs;
     for (auto &entry : fs::directory_iterator(full_path))
-        if (entry.is_directory())
-            dirs.push_back(entry);
+        dirs.push_back(entry);
 
     while (!dirs.empty())
     {
         auto entry = dirs.back();
         dirs.pop_back();
 
-        for (auto &subentry : fs::directory_iterator(entry))
-            if (subentry.is_directory())
+        const auto &subpath = entry.path();
+
+        auto [key, cache] = load_atlas_cache(subpath);
+        if (cache)
+        {
+            atlases.push_back(cache);
+            continue;
+        }
+
+        if (fs::is_regular_file(subpath))
+        {
+            try
+            {
+                auto &config_file = ConfigManager::instance().get_config();
+                auto obj = config_file.get()->as_object();
+                auto path_config = config_file["sprite_cut"][key];
+                auto [count, atlas] =
+                    load_atlas(
+                        renderer,
+                        subpath,
+                        path_config["rows"].as_int(),
+                        path_config["cols"].as_int());
+
+                if (count > 0)
+                    atlases.push_back(atlas);
+            }
+            catch (...)
+            {
+                continue;
+            }
+        }
+        else if (fs::is_directory(subpath))
+        {
+            for (auto &subentry : fs::directory_iterator(entry))
                 dirs.push_back(subentry);
 
-        const auto &subfolder = entry.path();
-
-        auto subfolder_str = subfolder.string();
-        auto full_subpath = subfolder / template_str;
-        auto full_template_str = full_subpath.u8string();
-        std::string full_template_std_str(reinterpret_cast<const char *>(full_template_str.c_str()), full_template_str.size());
-
-        auto [count, atlas] = load_atlas(renderer, full_template_std_str.c_str(), 0);
-
-        if (count > 0)
-            atlases.push_back(atlas);
+            auto subfolder_str = subpath.string();
+            auto full_subpath = subpath / template_str;
+            auto full_template_str = full_subpath.u8string();
+            std::string full_template_std_str(reinterpret_cast<const char *>(full_template_str.c_str()), full_template_str.size());
+            auto [count, atlas] = load_atlas(renderer, full_template_std_str.c_str(), 0);
+            if (count > 0)
+                atlases.push_back(atlas);
+        }
     }
 
     return atlases;
