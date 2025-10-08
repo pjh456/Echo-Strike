@@ -4,7 +4,8 @@
 #include <echo_strike/device/blend_mode.hpp>
 #include <echo_strike/device/flip_mode.hpp>
 #include <echo_strike/utils/color.hpp>
-#include <echo_strike/transform/vec2.hpp>
+#include <echo_strike/utils/vec2.hpp>
+#include <echo_strike/transform/point.hpp>
 #include <echo_strike/transform/rect.hpp>
 
 #include <cstdint>
@@ -45,8 +46,8 @@ public:
     bool set_draw_color(Color) const;
 
 public:
-    bool draw_point(const Vec2 &) const;
-    bool draw_line(const Vec2 &, const Vec2 &) const;
+    bool draw_point(const Point &) const;
+    bool draw_line(const Point &, const Point &) const;
     bool draw_rect(const Rect &) const;
     bool fill_rect(const Rect &) const;
 

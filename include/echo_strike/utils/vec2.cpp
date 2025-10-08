@@ -1,4 +1,4 @@
-#include <echo_strike/transform/vec2.hpp>
+#include <echo_strike/utils/vec2.hpp>
 
 #include <cmath>
 
@@ -19,6 +19,13 @@ Vec2 Vec2::operator-(const Vec2 &other) const
 Vec2 Vec2::operator*(const Vec2 &other) const
 {
     return Vec2(m_x * other.m_x, m_y * other.m_y);
+}
+
+Vec2 Vec2::operator/(const Vec2 &other) const
+{
+    float dx = other.m_x == 0 ? 0.0f : m_x / other.m_x;
+    float dy = other.m_y == 0 ? 0.0f : m_y / other.m_y;
+    return Vec2(dx, dy);
 }
 
 Vec2 Vec2::operator*(float ratio) const
@@ -52,6 +59,13 @@ Vec2 &Vec2::operator*=(const Vec2 &other)
 {
     this->m_x *= other.m_x;
     this->m_y *= other.m_y;
+    return *this;
+}
+
+Vec2 &Vec2::operator/=(const Vec2 &other)
+{
+    this->m_x = other.m_x == 0 ? 0.0f : this->m_x / other.m_x;
+    this->m_y = other.m_y == 0 ? 0.0f : this->m_y / other.m_y;
     return *this;
 }
 

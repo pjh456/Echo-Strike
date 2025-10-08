@@ -1,7 +1,5 @@
 #include <echo_strike/physics/physical_object.hpp>
 
-#include <echo_strike/transform/ray.hpp>
-
 // ====================================================================================
 // 段落 1: 构造函数 / 析构函数
 // ====================================================================================
@@ -85,12 +83,10 @@ void PhysicalObject::resolve_penetration_pair(ObstacleObject &wall)
     Rect box_rect = this->get_rect();
     Rect wall_rect = wall.get_rect();
 
-    Vec2 center_obj = box_rect.position() + box_rect.size() * 0.5f;
-    Vec2 center_wall = wall_rect.position() + wall_rect.size() * 0.5f;
-    Vec2 n = center_obj - center_wall; // 从墙指向物体的向量
+    Vec2 n = box_rect.center() - wall_rect.center(); // 从墙指向物体的向量
 
-    Vec2 half_size_obj = box_rect.size() * 0.5f;
-    Vec2 half_size_wall = wall_rect.size() * 0.5f;
+    Vec2 half_size_obj = box_rect.get_size() * 0.5f;
+    Vec2 half_size_wall = wall_rect.get_size() * 0.5f;
     float overlap_x = (half_size_obj.get_x() + half_size_wall.get_x()) - std::abs(n.get_x());
     float overlap_y = (half_size_obj.get_y() + half_size_wall.get_y()) - std::abs(n.get_y());
 
@@ -124,15 +120,13 @@ void PhysicalObject::resolve_penetration_pair(PhysicalObject &other)
     Rect box_rect = this->get_rect();
     Rect other_box_rect = other.get_rect();
 
-    Vec2 center1 = box_rect.position() + box_rect.size() * 0.5f;
-    Vec2 center2 = other_box_rect.position() + other_box_rect.size() * 0.5f;
-    Vec2 n = center2 - center1; // 从 this 指向 other 的向量
+    Vec2 n = other_box_rect.center() - box_rect.center(); // 从 this 指向 other 的向量
 
     if (n.length() < 1e-6f)
         n = Vec2(0, -1.0f); // 处理完美重叠的特殊情况
 
-    Vec2 half_size1 = box_rect.size() * 0.5f;
-    Vec2 half_size2 = other_box_rect.size() * 0.5f;
+    Vec2 half_size1 = box_rect.get_size() * 0.5f;
+    Vec2 half_size2 = other_box_rect.get_size() * 0.5f;
     float overlap_x = (half_size1.get_x() + half_size2.get_x()) - std::abs(n.get_x());
     float overlap_y = (half_size1.get_y() + half_size2.get_y()) - std::abs(n.get_y());
 
@@ -181,16 +175,12 @@ void PhysicalObject::handle_collision_response(ObstacleObject &wall)
     Rect box_rect = this->get_rect();
     Rect wall_rect = wall.get_rect();
 
-    // --- 【最终版：稳健且简单的法线计算逻辑】 ---
-    Vec2 center_obj = box_rect.position() + box_rect.size() * 0.5f;
-    Vec2 center_wall = wall_rect.position() + wall_rect.size() * 0.5f;
-
     // 1. 计算两个物体在X和Y轴上“合并”后的半长和半宽
-    float combined_half_w = (box_rect.size().get_x() + wall_rect.size().get_x()) * 0.5f;
-    float combined_half_h = (box_rect.size().get_y() + wall_rect.size().get_y()) * 0.5f;
+    float combined_half_w = (box_rect.get_width() + wall_rect.get_width()) * 0.5f;
+    float combined_half_h = (box_rect.get_height() + wall_rect.get_height()) * 0.5f;
 
     // 2. 计算中心向量 和 两个轴上的穿透/重叠量
-    Vec2 n = center_obj - center_wall; // 从墙指向物体的向量
+    Vec2 n = box_rect.center() - wall_rect.center(); // 从墙指向物体的向量
     float overlap_x = combined_half_w - std::abs(n.get_x());
     float overlap_y = combined_half_h - std::abs(n.get_y());
 
@@ -233,12 +223,10 @@ void PhysicalObject::handle_collision_response(PhysicalObject &other)
     Rect box_rect = this->get_rect();
     Rect other_box_rect = other.get_rect();
 
-    Vec2 center1 = box_rect.position() + box_rect.size() * 0.5f;
-    Vec2 center2 = other_box_rect.position() + other_box_rect.size() * 0.5f;
-    Vec2 n = center2 - center1; // 从 this(1) 指向 other(2) 的向量
+    Vec2 n = other_box_rect.center() - box_rect.center(); // 从 this(1) 指向 other(2) 的向量
 
-    float combined_half_w = (box_rect.size().get_x() + other_box_rect.size().get_x()) * 0.5f;
-    float combined_half_h = (box_rect.size().get_y() + other_box_rect.size().get_y()) * 0.5f;
+    float combined_half_w = (box_rect.get_width() + other_box_rect.get_width()) * 0.5f;
+    float combined_half_h = (box_rect.get_height() + other_box_rect.get_height()) * 0.5f;
 
     float overlap_x = combined_half_w - std::abs(n.get_x());
     float overlap_y = combined_half_h - std::abs(n.get_y());

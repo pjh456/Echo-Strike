@@ -83,7 +83,7 @@ bool Renderer::set_draw_color(Color color) const
     return SDL_SetRenderDrawColor(renderer, color.R, color.G, color.B, color.A);
 }
 
-bool Renderer::draw_point(const Vec2 &pos) const
+bool Renderer::draw_point(const Point &pos) const
 {
     if (!renderer)
         return false;
@@ -91,7 +91,7 @@ bool Renderer::draw_point(const Vec2 &pos) const
     return SDL_RenderPoint(renderer, pos.get_x(), pos.get_y());
 }
 
-bool Renderer::draw_line(const Vec2 &from, const Vec2 &to) const
+bool Renderer::draw_line(const Point &from, const Point &to) const
 {
     if (!renderer)
         return false;

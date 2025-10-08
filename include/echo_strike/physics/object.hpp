@@ -2,7 +2,8 @@
 #define INCLUDE_OBJECT
 
 #include <echo_strike/utils/class_marcos.hpp>
-#include <echo_strike/transform/vec2.hpp>
+
+#include <echo_strike/utils/vec2.hpp>
 #include <echo_strike/transform/rect.hpp>
 
 #include <SDL3/SDL.h>

@@ -3,7 +3,7 @@
 
 #include <echo_strike/utils/class_marcos.hpp>
 
-#include <echo_strike/transform/vec2.hpp>
+#include <echo_strike/utils/vec2.hpp>
 #include <echo_strike/transform/rect.hpp>
 #include <echo_strike/core/timer.hpp>
 #include <echo_strike/image/image.hpp>
@@ -35,7 +35,7 @@ private:
     std::vector<Frame> frames;
     size_t frame_idx;
     CLASS_PROPERTY(float, interval);
-    CLASS_PROPERTY(Vec2, position);
+    CLASS_PROPERTY(Point, position);
     CLASS_PROPERTY(AnchorMode, anchor_mode);
 
 public:
