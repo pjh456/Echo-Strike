@@ -147,13 +147,13 @@ public:
     }
 
 public:
-    inline std::filesystem::path
+    std::filesystem::path
     remove_prefix(const std::filesystem::path &);
 
-    inline static std::string
-    normalize_key(const std::filesystem::path &path);
+    static std::string
+    normalize_key(const std::filesystem::path &);
 
-    inline static std::string
+    static std::string
     normalize_key(const std::string &str)
     {
         return normalize_key(std::filesystem::u8path(str));

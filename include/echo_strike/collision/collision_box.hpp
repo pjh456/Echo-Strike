@@ -66,12 +66,7 @@ public:
     void set_rect(const Rect &rect);
 
     Object *get_object() const { return m_object; }
-    void set_object(Object *obj)
-    {
-        if (m_object)
-            delete m_object;
-        m_object = obj;
-    }
+    void set_object(Object *);
 };
 
 #endif // INCLUDE_COLLISION_BOX

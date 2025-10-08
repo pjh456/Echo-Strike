@@ -1,5 +1,6 @@
 #include <echo_strike/collision/collision_box.hpp>
 
+#include <echo_strike/physics/object.hpp>
 #include <echo_strike/collision/collision_manager.hpp>
 
 CollisionBox::CollisionBox()
@@ -71,4 +72,11 @@ void CollisionBox::set_rect(const Rect &rect)
     // CollisionManager::instance().quad_tree().update(m_rect, rect, this);
     CollisionManager::instance().quad_tree().update(rect, this);
     m_rect = rect;
+}
+
+void CollisionBox::set_object(Object *obj)
+{
+    if (m_object)
+        delete m_object;
+    m_object = obj;
 }

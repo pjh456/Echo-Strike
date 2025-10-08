@@ -91,10 +91,10 @@ protected:
 
 public:
     CollisionBox *get_hit_box() const { return m_hit_box; }
-    void set_hit_box(CollisionBox *box) { m_hit_box = box; }
+    void set_hit_box(CollisionBox *);
 
     CollisionBox *get_hurt_box() const { return m_hurt_box; }
-    CollisionBox *set_hurt_box(CollisionBox *box);
+    void set_hurt_box(CollisionBox *);
 };
 
 #endif // INCLUDE_ENTITY

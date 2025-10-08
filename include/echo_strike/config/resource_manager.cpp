@@ -150,7 +150,7 @@ ResourceManager::
     {
         for (int c = 0; c < cols; ++c)
         {
-            SDL_FRect frect{c * frame_w, r * frame_h, frame_w, frame_h};
+            SDL_FRect frect{(float)c * frame_w, (float)r * frame_h, (float)frame_w, (float)frame_h};
             SDL_Texture *sub_tex =
                 SDL_CreateTexture(
                     renderer,
@@ -318,7 +318,7 @@ std::shared_ptr<Atlas> ResourceManager::get_atlas(const KeyType &name) const
     return it->second;
 }
 
-inline std::filesystem::path
+std::filesystem::path
 ResourceManager::
     remove_prefix(const std::filesystem::path &path)
 {
@@ -343,7 +343,7 @@ ResourceManager::
     return rel_path;
 }
 
-inline std::string ResourceManager::normalize_key(const std::filesystem::path &path)
+std::string ResourceManager::normalize_key(const std::filesystem::path &path)
 {
     namespace fs = std::filesystem;
     auto normal_path = path.lexically_normal();
