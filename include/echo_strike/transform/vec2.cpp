@@ -1,4 +1,4 @@
-#include <echo_strike/utils/vec2.hpp>
+#include <echo_strike/transform/vec2.hpp>
 
 #include <cmath>
 

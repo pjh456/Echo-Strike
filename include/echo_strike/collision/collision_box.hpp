@@ -1,7 +1,7 @@
 #ifndef INCLUDE_COLLISION_BOX
 #define INCLUDE_COLLISION_BOX
 
-#include <echo_strike/utils/rect.hpp>
+#include <echo_strike/transform/rect.hpp>
 #include <echo_strike/utils/color.hpp>
 
 #include <echo_strike/collision/collision_layer.hpp>

@@ -1,6 +1,6 @@
 #include <echo_strike/physics/physical_object.hpp>
 
-#include <echo_strike/utils/ray.hpp>
+#include <echo_strike/transform/ray.hpp>
 
 // ====================================================================================
 // 段落 1: 构造函数 / 析构函数

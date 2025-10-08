@@ -3,8 +3,8 @@
 
 #include <echo_strike/utils/class_marcos.hpp>
 
-#include <echo_strike/utils/vec2.hpp>
-#include <echo_strike/utils/rect.hpp>
+#include <echo_strike/transform/vec2.hpp>
+#include <echo_strike/transform/rect.hpp>
 #include <echo_strike/core/timer.hpp>
 #include <echo_strike/image/image.hpp>
 #include <echo_strike/image/atlas.hpp>

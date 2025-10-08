@@ -1,7 +1,7 @@
 #ifndef INCLUDE_QUADTREE
 #define INCLUDE_QUADTREE
 
-#include <echo_strike/utils/rect.hpp>
+#include <echo_strike/transform/rect.hpp>
 
 #include <cstdint>
 #include <vector>

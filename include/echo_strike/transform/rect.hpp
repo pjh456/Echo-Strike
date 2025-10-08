@@ -3,8 +3,8 @@
 
 #include <echo_strike/utils/class_marcos.hpp>
 
-#include <echo_strike/utils/vec2.hpp>
-#include <echo_strike/utils/ray.hpp>
+#include <echo_strike/transform/vec2.hpp>
+#include <echo_strike/transform/ray.hpp>
 
 #include <SDL3/SDL.h>
 

@@ -4,8 +4,8 @@
 #include <echo_strike/device/blend_mode.hpp>
 #include <echo_strike/device/flip_mode.hpp>
 #include <echo_strike/utils/color.hpp>
-#include <echo_strike/utils/vec2.hpp>
-#include <echo_strike/utils/rect.hpp>
+#include <echo_strike/transform/vec2.hpp>
+#include <echo_strike/transform/rect.hpp>
 
 #include <cstdint>
 #include <utility>

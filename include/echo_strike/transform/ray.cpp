@@ -1,4 +1,4 @@
-#include <echo_strike/utils/ray.hpp>
+#include <echo_strike/transform/ray.hpp>
 
 float Ray::length() const { return (m_dst - m_src).length(); }
 
