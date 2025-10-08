@@ -7,6 +7,7 @@
 #include <echo_strike/utils/vec2.hpp>
 #include <echo_strike/transform/point.hpp>
 #include <echo_strike/transform/rect.hpp>
+#include <echo_strike/device/camera2d.hpp>
 
 #include <cstdint>
 #include <utility>
@@ -17,6 +18,7 @@ struct SDL_Window;
 
 class Window;
 class RendererBuilder;
+class Camera2D;
 
 class Renderer
 {
@@ -31,6 +33,7 @@ public:
 private:
     SDL_Renderer *renderer = nullptr;
     SDL_Window *window = nullptr;
+    Camera2D *camera = nullptr;
 
 public:
     Renderer(SDL_Window *, SDL_Renderer *);
@@ -81,6 +84,9 @@ public:
 public:
     SDL_Renderer *get_raw() const { return renderer; }
     void set_raw(SDL_Renderer *r) { renderer = r; }
+
+    Camera2D *get_camera() const { return camera; }
+    void set_camera(Camera2D *c) { camera = c; }
 };
 
 class RendererBuilder

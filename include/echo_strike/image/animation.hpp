@@ -14,6 +14,8 @@
 
 #include <vector>
 
+class Renderer;
+
 class Animation
 {
 public:
@@ -75,6 +77,7 @@ public:
     const Frame &operator[](size_t idx) const { return frames[idx]; }
 
     void render(SDL_Renderer *) const;
+    void render(Renderer *) const;
 };
 
 #endif // INCLUDE_ANIMATION

@@ -88,7 +88,8 @@ bool Renderer::draw_point(const Point &pos) const
     if (!renderer)
         return false;
 
-    return SDL_RenderPoint(renderer, pos.get_x(), pos.get_y());
+    auto point = camera ? camera->world_to_screen(pos) : pos;
+    return SDL_RenderPoint(renderer, point.get_x(), point.get_y());
 }
 
 bool Renderer::draw_line(const Point &from, const Point &to) const
@@ -96,7 +97,13 @@ bool Renderer::draw_line(const Point &from, const Point &to) const
     if (!renderer)
         return false;
 
-    return SDL_RenderLine(renderer, from.get_x(), from.get_y(), to.get_x(), to.get_y());
+    auto from_point = camera ? camera->world_to_screen(from) : from;
+    auto to_point = camera ? camera->world_to_screen(to) : to;
+
+    return SDL_RenderLine(
+        renderer,
+        from_point.get_x(), from_point.get_y(),
+        to_point.get_x(), to_point.get_y());
 }
 
 bool Renderer::draw_rect(const Rect &rect) const
@@ -104,7 +111,8 @@ bool Renderer::draw_rect(const Rect &rect) const
     if (!renderer)
         return false;
 
-    auto frect = rect.to_frect();
+    auto screen_rect = camera ? camera->world_to_screen(rect) : rect;
+    auto frect = screen_rect.to_frect();
     return SDL_RenderRect(renderer, &frect);
 }
 
@@ -113,7 +121,8 @@ bool Renderer::fill_rect(const Rect &rect) const
     if (!renderer)
         return false;
 
-    auto frect = rect.to_frect();
+    auto screen_rect = camera ? camera->world_to_screen(rect) : rect;
+    auto frect = screen_rect.to_frect();
     return SDL_RenderFillRect(renderer, &frect);
 }
 
@@ -124,20 +133,35 @@ bool Renderer::draw_texture(
     double angle,
     FlipMode flip)
 {
-    if (!renderer)
+    if (!renderer || !dst)
         return false;
 
-    auto dst_frect = dst->to_frect();
-    auto src_frect = src->to_frect();
+    auto dst_rect = (camera != nullptr) ? (camera->world_to_screen(*dst)) : *dst;
+    auto dst_frect = dst_rect.to_frect();
 
-    return SDL_RenderTextureRotated(
-        renderer,
-        texture,
-        &src_frect,
-        &dst_frect,
-        angle,
-        nullptr,
-        static_cast<SDL_FlipMode>(flip));
+    if (src)
+    {
+        auto src_frect = src->to_frect();
+        return SDL_RenderTextureRotated(
+            renderer,
+            texture,
+            &src_frect,
+            &dst_frect,
+            angle,
+            nullptr,
+            static_cast<SDL_FlipMode>(flip));
+    }
+    else
+    {
+        return SDL_RenderTextureRotated(
+            renderer,
+            texture,
+            nullptr,
+            &dst_frect,
+            angle,
+            nullptr,
+            static_cast<SDL_FlipMode>(flip));
+    }
 }
 
 bool Renderer::set_target(SDL_Texture *texture)

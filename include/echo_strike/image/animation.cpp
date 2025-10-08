@@ -1,5 +1,7 @@
 #include <echo_strike/image/animation.hpp>
 
+#include <echo_strike/device/renderer.hpp>
+
 #include <utility>
 
 Animation::Animation(float interval)
@@ -138,4 +140,40 @@ void Animation::render(SDL_Renderer *renderer) const
 
     auto temp_src = frame.src.to_frect();
     SDL_RenderTexture(renderer, frame.img->get_texture(), &temp_src, &dst);
+}
+
+// void Animation::render(Renderer *renderer) const
+// {
+//     if (frames.empty())
+//         return;
+
+//     auto frame = get_current_frame();
+
+//     // 世界坐标矩形（逻辑空间）
+//     auto dst = Rect(m_position, Vec2(frame.img->get_width(), frame.img->get_height()));
+
+//     if (m_anchor_mode == AnchorMode::BottomCentered)
+//         dst.set_y(dst.get_y() + frame.img->get_height());
+//     else
+//         dst.set_y(dst.get_y() + (frame.img->get_height() / 2));
+
+//     if (renderer && renderer->get_camera())
+//         dst = renderer->get_camera()->world_to_screen(dst);
+
+//     auto temp_src = frame.src.to_frect();
+//     renderer->draw_texture(frame.img->get_texture(), &frame.src, &dst);
+// }
+
+void Animation::render(Renderer *renderer) const
+{
+    if (frames.empty())
+        return;
+    auto frame = get_current_frame();
+    auto dst = Rect(m_position, Vec2(frame.img->get_width(), frame.img->get_height()));
+    if (m_anchor_mode == AnchorMode::BottomCentered)
+        dst.set_y(dst.get_y() + frame.img->get_height());
+    else
+        dst.set_y(dst.get_y() + (frame.img->get_height() / 2));
+    auto temp_src = frame.src.to_frect();
+    renderer->draw_texture(frame.img->get_texture(), &dst, &frame.src);
 }
