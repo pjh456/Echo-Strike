@@ -13,9 +13,12 @@
 #include <functional>
 
 class CollisionBox;
+class EntityManager;
 
 class Entity : public Object
 {
+    friend class EntityManager;
+
 protected:
     const float FLOOR = 640.0f;
     const float WIDTH = 800.0f;
@@ -27,9 +30,10 @@ protected:
     CollisionBox *m_hit_box;
     CollisionBox *m_hurt_box;
 
-public:
+protected:
     Entity();
 
+public:
     virtual ~Entity();
 
     Entity(const Entity &) = delete;
@@ -47,26 +51,11 @@ public:
 
 public:
     virtual void on_input() {}
-    virtual void on_update(float delta)
-    {
-        Object::on_update(delta);
-        anim_sm.on_update(delta);
-        fix_position();
-    }
+    virtual void on_update(float);
 
-    virtual void on_hurt(int val, Entity * = nullptr) {}
+    virtual void on_hurt(int, Entity * = nullptr) {}
 
-    virtual void on_render(SDL_Renderer *renderer)
-    {
-        auto raw_ptr = anim_sm.get_current_state();
-        if (!raw_ptr)
-            return;
-
-        if (auto it = dynamic_cast<EntityState *>(raw_ptr))
-        {
-            it->get_anim().render(renderer);
-        }
-    }
+    virtual void on_render(Renderer *);
 
 public:
     virtual Status &get_status() { return stus; }
@@ -74,20 +63,6 @@ public:
 
     virtual StateMachine &get_state_machine() { return anim_sm; }
     virtual const StateMachine &get_state_machine() const { return anim_sm; }
-
-protected:
-    virtual void fix_position()
-    {
-        auto rect = Object::m_rect;
-        if (m_rect.bottom() <= 0)
-            m_rect.set_y(0);
-        if (m_rect.top() >= FLOOR)
-            m_rect.set_y(FLOOR - m_rect.get_height());
-        if (m_rect.left() <= 0)
-            m_rect.set_x(0);
-        if (m_rect.right() >= WIDTH)
-            m_rect.set_x(WIDTH - m_rect.get_width());
-    }
 
 public:
     CollisionBox *get_hit_box() const { return m_hit_box; }
