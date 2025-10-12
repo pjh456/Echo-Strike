@@ -19,11 +19,11 @@ class Renderer;
 class Animation
 {
 public:
-    enum class AnchorMode
-    {
-        Centered,
-        BottomCentered
-    };
+    // enum class AnchorMode
+    // {
+    //     Centered,
+    //     BottomCentered
+    // };
 
 private:
     struct Frame
@@ -36,9 +36,11 @@ private:
     Timer timer;
     std::vector<Frame> frames;
     size_t frame_idx;
+
+    // AnchorMode m_anchor_mode = AnchorMode::BottomCentered;
+
     CLASS_PROPERTY(float, interval);
     CLASS_PROPERTY(Point, position);
-    CLASS_PROPERTY(AnchorMode, anchor_mode);
 
 public:
     Animation(float);
@@ -70,14 +72,17 @@ public:
     void add_frames(const Atlas &);
 
 public:
-    Frame &get_current_frame() { return frames[frame_idx]; }
-    const Frame &get_current_frame() const { return frames[frame_idx]; }
-
     Frame &operator[](size_t idx) { return frames[idx]; }
     const Frame &operator[](size_t idx) const { return frames[idx]; }
 
-    void render(SDL_Renderer *) const;
     void render(Renderer *) const;
+
+public:
+    Frame &get_current_frame() { return frames[frame_idx]; }
+    const Frame &get_current_frame() const { return frames[frame_idx]; }
+
+    // AnchorMode get_anchor_mode() const { return m_anchor_mode; }
+    // void set_anchor_mode(AnchorMode m) { m_anchor_mode = m; }
 };
 
 #endif // INCLUDE_ANIMATION

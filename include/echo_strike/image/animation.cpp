@@ -10,8 +10,8 @@ Animation::Animation(float interval)
       timer(
           [this]()
           { frame_idx = frame_idx == frames.size() - 1 ? 0 : frame_idx + 1; }),
-      m_position(),
-      m_anchor_mode(AnchorMode::Centered)
+      m_position()
+//   m_anchor_mode(AnchorMode::Centered)
 {
     timer.set_timeout_time(m_interval);
 }
@@ -25,8 +25,8 @@ Animation::Animation(Animation &&other) noexcept
       timer(std::move(other.timer)),
       frames(std::move(other.frames)),
       frame_idx(other.frame_idx),
-      m_position(other.m_position),
-      m_anchor_mode(other.m_anchor_mode)
+      m_position(other.m_position)
+//   m_anchor_mode(other.m_anchor_mode)
 {
 }
 
@@ -35,10 +35,12 @@ Animation &Animation::operator=(Animation &&other) noexcept
     if (this == &other)
         return *this;
 
+    m_interval = other.m_interval;
     timer = std::move(other.timer);
     frames = std::move(other.frames);
     frame_idx = other.frame_idx;
-    m_anchor_mode = other.m_anchor_mode;
+    m_position = other.m_position;
+    // m_anchor_mode = other.m_anchor_mode;
     return *this;
 }
 
@@ -123,35 +125,13 @@ void Animation::add_frames(const Atlas &atlas)
     }
 }
 
-void Animation::render(SDL_Renderer *renderer) const
-{
-    if (frames.empty())
-        return;
-
-    auto frame = get_current_frame();
-    SDL_FRect dst;
-    dst.w = frame.img->get_width(), dst.h = frame.img->get_height();
-    dst.x = m_position.get_x() + (frame.img->get_width() / 2);
-    dst.y = m_position.get_y();
-    if (m_anchor_mode == AnchorMode::BottomCentered)
-        dst.y += (frame.img->get_height());
-    else
-        dst.y += (frame.img->get_height() / 2);
-
-    auto temp_src = frame.src.to_frect();
-    SDL_RenderTexture(renderer, frame.img->get_texture(), &temp_src, &dst);
-}
-
 void Animation::render(Renderer *renderer) const
 {
     if (frames.empty())
         return;
     auto frame = get_current_frame();
     auto dst = Rect(m_position, Vec2(frame.img->get_width(), frame.img->get_height()));
-    if (m_anchor_mode == AnchorMode::BottomCentered)
-        dst.set_y(dst.get_y() + frame.img->get_height());
-    else
-        dst.set_y(dst.get_y() + (frame.img->get_height() / 2));
+
     auto temp_src = frame.src.to_frect();
     renderer->draw_texture(frame.img->get_texture(), &dst, &frame.src);
 }
