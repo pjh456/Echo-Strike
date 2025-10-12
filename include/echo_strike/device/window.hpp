@@ -72,6 +72,8 @@ public:
         return *this;
     }
 
+    WindowBuilder &size(const Vec2 &s) { return size(s.get_x(), s.get_y()); }
+
     WindowBuilder &set_title(const std::string &t)
     {
         title = t;
