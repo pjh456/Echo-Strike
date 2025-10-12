@@ -13,6 +13,8 @@
 #include <echo_strike/config/config_manager.hpp>
 #include <echo_strike/config/resource_manager.hpp>
 
+#include <echo_strike/collision/collision_box.hpp>
+
 int main()
 {
     namespace fs = std::filesystem;
@@ -20,20 +22,36 @@ int main()
     fs::path resource_path("E:/Projects/games/echo strike/resources");
     Rect bound{0, 0, 800, 600};
     float speed_rate = 200.0;
-    float friction = 10.0;
 
     auto &imanager = InputManager::instance();
-    auto window = Window::create().set_title("entity test").resizable(false).visible(false).size(bound.get_size()).build();
-    auto renderer = window.create_renderer().build();
+    auto window =
+        Window::create()
+            .set_title("entity test")
+            .resizable(false)
+            .visible(false)
+            .size(bound.get_size())
+            .build();
+    auto renderer =
+        window
+            .create_renderer()
+            .build();
 
     auto &cmanager = ConfigManager::instance();
     cmanager.load_config(config_path);
+    auto &config = cmanager.get_config();
     auto &rmanager = ResourceManager::instance();
     rmanager.load_atlases(renderer.get_raw(), resource_path, "{}.png");
 
     auto &emanager = EntityManager::instance();
     emanager.boundary() = bound;
     auto player = emanager.create_entity<Entity>();
+
+    auto &mcontroller = player->get_movement_controller();
+    mcontroller.set_mode(MovementController::MovementMode::InstantAccelSmoothStop);
+    mcontroller.set_max_speed(config["physics"]["max_speed"].as_float());
+    mcontroller.set_accel_rate(config["physics"]["accel_rate"].as_float());
+    mcontroller.set_decel_rate(config["physics"]["decel_rate"].as_float());
+
     auto &stm = player->get_state_machine();
 
     auto [idle_key, idle_anim] = rmanager.load_atlas_cache("player/idle.png");
@@ -65,7 +83,11 @@ int main()
 
     while (running)
     {
+        renderer.set_draw_color({0, 0, 0});
         renderer.clear();
+
+        imanager.update();
+
         if (imanager.is_key_pressed(SDL_SCANCODE_ESCAPE))
             running = false;
 
@@ -82,15 +104,13 @@ int main()
         if (move_direction.length() > 0)
         {
             stm.switch_to("run");
-            player->set_speed(move_direction * speed_rate);
+            player->set_move_direction(move_direction);
         }
         else
         {
             stm.switch_to("idle");
-            player->set_speed({0.0f, 0.0f}), player->set_force({0.0f, 0.0f});
+            player->set_move_direction(move_direction);
         }
-
-        imanager.update();
 
         auto cur_time = std::chrono::high_resolution_clock::now();
         auto dur_time = std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - now);
@@ -98,6 +118,7 @@ int main()
 
         emanager.on_update(dur_time.count());
         emanager.on_render(&renderer);
+        player->get_hurt_box()->render_border(renderer.get_raw());
 
         renderer.present();
 

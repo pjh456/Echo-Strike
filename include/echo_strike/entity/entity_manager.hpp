@@ -27,7 +27,7 @@ public:
             ets.push_back(ptr);
 
             ptr->set_boundary(bound);
-            ptr->set_type(Object::MotionType::LimitedInBoundary);
+            ptr->set_motion_type(Object::MotionType::LimitedInBoundary);
 
             return t;
         }

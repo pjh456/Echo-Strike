@@ -20,10 +20,6 @@ class Entity : public Object
     friend class EntityManager;
 
 protected:
-    const float FLOOR = 640.0f;
-    const float WIDTH = 800.0f;
-
-protected:
     Status stus;
     StateMachine anim_sm;
 

@@ -1,4 +1,9 @@
 {
+    "physics": {
+        "accel_rate": 400.0,
+        "decel_rate": 500.0,
+        "max_speed": 500.0
+    },
     "sprite_cut": {
         "ui_heart.png": {
             "rows": 1,

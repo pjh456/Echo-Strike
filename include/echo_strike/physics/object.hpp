@@ -6,6 +6,8 @@
 #include <echo_strike/utils/vec2.hpp>
 #include <echo_strike/transform/rect.hpp>
 
+#include <echo_strike/physics/movement_controller.hpp>
+
 #include <SDL3/SDL.h>
 
 class Object
@@ -19,6 +21,8 @@ public:
 
 protected:
     MotionType m_type = MotionType::IgnoreBoundary;
+    Vec2 move_dir;
+    MovementController move_ctrl;
 
     CLASS_PROPERTY(Rect, rect)
     CLASS_PROPERTY(Vec2, speed)
@@ -39,11 +43,16 @@ public:
 
     void on_update(float ms)
     {
+
         float delta = ms / 1000;
         float delta_pos_x = delta * m_speed.get_x();
         float delta_pos_y = delta * m_speed.get_y();
         m_rect.set_x(m_rect.get_x() + delta_pos_x);
         m_rect.set_y(m_rect.get_y() + delta_pos_y);
+
+        Vec2 cur_speed = get_speed();
+        Vec2 new_speed = move_ctrl.update_velocity(cur_speed, move_dir, ms);
+        set_speed(new_speed);
 
         float delta_speed_x = delta * m_force.get_x();
         float delta_speed_y = delta * m_force.get_y();
@@ -68,8 +77,14 @@ public:
     }
 
 public:
-    MotionType get_type() const { return m_type; }
-    void set_type(MotionType t) { m_type = t; }
+    MotionType get_motion_type() const { return m_type; }
+    void set_motion_type(MotionType t) { m_type = t; }
+
+    MovementController &get_movement_controller() { return move_ctrl; }
+    const MovementController &get_movement_controller() const { return move_ctrl; }
+
+    Vec2 get_move_direction() const { return move_dir; }
+    void set_move_direction(const Vec2 &dir) { move_dir = dir; }
 };
 
 #endif // INCLUDE_OBJECT
