@@ -3,9 +3,12 @@
 
 #include <echo_strike/entity/entity.hpp>
 #include <echo_strike/entity/entity_state.hpp>
+
 #include <echo_strike/device/input_manager.hpp>
-#include <echo_strike/config/resource_manager.hpp>
 #include <echo_strike/device/device_manager.hpp>
+
+#include <echo_strike/config/resource_manager.hpp>
+#include <echo_strike/config/config_manager.hpp>
 
 class Player : public Entity
 {
@@ -20,25 +23,27 @@ public:
         auto &manager = ResourceManager::instance();
         auto renderer = DeviceManager::instance().get_renderer();
 
-        auto idle_anim = new EntityState();
-        auto [idle_count, idle_atlas] =
-            manager.load_atlas(
-                renderer->get_renderer(),
-                "player/idle");
-        idle_anim->get_anim().add_frames(*idle_atlas);
-        anim_sm.register_state("idle", idle_anim);
+        init_move_controller();
+        load_animations("player");
     }
 
     ~Player()
     {
+        Entity::~Entity();
     }
 
 public:
-    void on_update(float delta) override
+    void on_update(float ms) { Entity::on_update(ms); }
+
+private:
+    void init_move_controller()
     {
-        Entity::on_update(delta);
-        if (m_rect.top() == FLOOR)
-            anim_sm.switch_to("idle");
+        auto &config = ConfigManager::instance().get_config();
+        auto &mcontroller = get_movement_controller();
+        mcontroller.set_mode(MovementController::MovementMode::InstantAccelSmoothStop);
+        mcontroller.set_max_speed(config["physics"]["max_speed"].as_float());
+        mcontroller.set_accel_rate(config["physics"]["accel_rate"].as_float());
+        mcontroller.set_decel_rate(config["physics"]["decel_rate"].as_float());
     }
 };
 
