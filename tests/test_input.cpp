@@ -27,7 +27,7 @@ int main()
         return -1;
     }
 
-    auto manager = InputManager::instance();
+    auto &manager = InputManager::instance();
 
     bool running = true;
     while (running)
