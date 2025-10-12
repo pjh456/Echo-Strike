@@ -9,6 +9,7 @@
 #include <echo_strike/physics/movement_controller.hpp>
 
 #include <SDL3/SDL.h>
+#include <iostream>
 
 class Object
 {
@@ -23,6 +24,8 @@ protected:
     MotionType m_type = MotionType::IgnoreBoundary;
     Vec2 move_dir;
     MovementController move_ctrl;
+
+    float m_mass = 1.0;
 
     CLASS_PROPERTY(Rect, rect)
     CLASS_PROPERTY(Vec2, speed)
@@ -44,19 +47,30 @@ public:
     void on_update(float ms)
     {
         float delta = ms / 1000;
-        float delta_pos_x = delta * m_speed.get_x();
-        float delta_pos_y = delta * m_speed.get_y();
-        m_rect.set_x(m_rect.get_x() + delta_pos_x);
-        m_rect.set_y(m_rect.get_y() + delta_pos_y);
+        if (delta <= 0)
+            return;
 
-        Vec2 cur_speed = get_speed();
-        Vec2 new_speed = move_ctrl.update_velocity(cur_speed, move_dir, ms);
-        set_speed(new_speed);
+        m_rect += m_speed * delta;
 
-        float delta_speed_x = delta * m_force.get_x();
-        float delta_speed_y = delta * m_force.get_y();
-        m_speed.set_x(m_speed.get_x() + delta_speed_x);
-        m_speed.set_y(m_speed.get_y() + delta_speed_y);
+        Vec2 total_acceleration = m_force / m_mass;
+        Vec2 steering_accel = move_ctrl.calculate_steering_acceleration(m_speed, move_dir);
+        total_acceleration += steering_accel;
+        m_speed += total_acceleration * delta;
+
+        if (move_ctrl.get_mode() == MovementController::MovementMode::Instant)
+        {
+            Vec2 target_velocity = move_dir.normalize() * move_ctrl.get_max_speed();
+
+            if (std::abs(move_dir.get_x()) > 1e-6f)
+                m_speed.set_x(target_velocity.get_x());
+            else if (std::abs(steering_accel.get_x()) > 1e-6f)
+                m_speed.set_x(m_speed.get_x() + steering_accel.get_x() * delta);
+
+            if (std::abs(move_dir.get_y()) > 1e-6f)
+                m_speed.set_y(target_velocity.get_y());
+            else if (std::abs(steering_accel.get_y()) > 1e-6f)
+                m_speed.set_y(m_speed.get_y() + steering_accel.get_y() * delta);
+        }
 
         if (m_type == MotionType::LimitedInBoundary)
         {
@@ -76,6 +90,9 @@ public:
     }
 
 public:
+    float get_mass() const { return m_mass; }
+    void set_mass(float m) { m_mass = m; }
+
     MotionType get_motion_type() const { return m_type; }
     void set_motion_type(MotionType t) { m_type = t; }
 

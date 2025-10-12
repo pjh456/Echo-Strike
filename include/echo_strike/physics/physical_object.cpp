@@ -6,7 +6,7 @@
 
 PhysicalObject::PhysicalObject()
     : box(*CollisionManager::instance().create_collision_box()),
-      m_mess(1.0)
+      m_mass(1.0)
 {
     box.set_object(this);
     box.set_src(CollisionLayer::Physics);
@@ -152,7 +152,7 @@ void PhysicalObject::resolve_penetration_pair(PhysicalObject &other)
 
     const float k_slop = 0.01f;
     const float percent = 0.8f;
-    float total_inv_mass = (1.0f / m_mess) + (1.0f / other.m_mess);
+    float total_inv_mass = (1.0f / m_mass) + (1.0f / other.m_mass);
     if (total_inv_mass < 1e-6f)
         return; // 如果两个物体都不可移动
 
@@ -160,8 +160,8 @@ void PhysicalObject::resolve_penetration_pair(PhysicalObject &other)
 
     // 【关键修正】根据修正后的法线方向，正确地移动两个物体
     // this 应该沿着法线方向移动，other 应该沿着反方向移动
-    this->set_rect(this->get_rect() + correction * (1.0f / m_mess));
-    other.set_rect(other.get_rect() - correction * (1.0f / other.m_mess));
+    this->set_rect(this->get_rect() + correction * (1.0f / m_mass));
+    other.set_rect(other.get_rect() - correction * (1.0f / other.m_mass));
 }
 
 // ====================================================================================
@@ -210,11 +210,11 @@ void PhysicalObject::handle_collision_response(ObstacleObject &wall)
     // 冲量公式 j 的分子是 -(1 + e) * v_rel_normal
     // 因为这里 v_rel_normal 已经保证是负数或零，所以整个冲量 j 是正数，代表一个推开的力
     float j = -(1 + restitution) * vel_along_normal;
-    j /= (1 / m_mess); // 除以逆质量
+    j /= (1 / m_mass); // 除以逆质量
 
     Vec2 impulse = contact_normal * j;
 
-    this->set_speed(u_obj + impulse * (1 / m_mess));
+    this->set_speed(u_obj + impulse * (1 / m_mass));
 }
 
 void PhysicalObject::handle_collision_response(PhysicalObject &other)
