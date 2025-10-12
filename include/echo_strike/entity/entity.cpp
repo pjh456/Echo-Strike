@@ -2,6 +2,11 @@
 
 #include <echo_strike/collision/collision_manager.hpp>
 
+#include <echo_strike/config/config_manager.hpp>
+#include <echo_strike/config/resource_manager.hpp>
+
+#include <pjh_json/helpers/json_ref.hpp>
+
 Entity::Entity()
 {
     m_hit_box = CollisionManager::instance().create_collision_box();
@@ -38,6 +43,25 @@ void Entity::on_render(Renderer *renderer)
         m_hurt_box->set_rect(hurt_box_rect);
 
         ptr->get_anim().render(renderer);
+    }
+}
+
+void Entity::load_animations(const std::string &key)
+{
+    auto &config = ConfigManager::instance().get_config();
+    auto anims = config["animations"][key].get()->as_array()->as_vector();
+
+    for (auto anim : anims)
+    {
+        auto obj = pjh_std::json::Ref(anim->as_object());
+        auto [anim_key, anim_cache] = ResourceManager::instance().load_atlas_cache(obj["key"].as_str());
+        if (anim_cache)
+        {
+            auto anim_node = new EntityState(this);
+            anim_node->get_anim().add_frames(*anim_cache);
+            anim_node->get_anim().set_interval(obj["interval"].as_float());
+            anim_sm.register_state(obj["name"].as_str(), anim_node);
+        }
     }
 }
 

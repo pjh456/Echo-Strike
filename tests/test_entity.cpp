@@ -53,20 +53,7 @@ int main()
     mcontroller.set_decel_rate(config["physics"]["decel_rate"].as_float());
 
     auto &stm = player->get_state_machine();
-
-    auto player_anims = config["animations"]["player"].get()->as_array()->as_vector();
-    for (auto anim : player_anims)
-    {
-        auto obj = pjh_std::json::Ref(anim->as_object());
-        auto [anim_key, anim_cache] = rmanager.load_atlas_cache(obj["key"].as_str());
-        if (anim_cache)
-        {
-            auto anim_node = new EntityState(player);
-            anim_node->get_anim().add_frames(*anim_cache);
-            anim_node->get_anim().set_interval(obj["interval"].as_float());
-            stm.register_state(obj["name"].as_str(), anim_node);
-        }
-    }
+    player->load_animations("player");
 
     stm.set_entry("idle");
 

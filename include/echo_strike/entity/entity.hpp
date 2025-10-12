@@ -53,6 +53,8 @@ public:
 
     virtual void on_render(Renderer *);
 
+    void load_animations(const std::string &key);
+
 public:
     virtual Status &get_status() { return stus; }
     virtual const Status &get_status() const { return stus; }
