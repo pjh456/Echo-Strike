@@ -27,26 +27,38 @@ public:
 public:
     Vec2 update_velocity(const Vec2 &cur, const Vec2 &dir, float ms)
     {
-        Vec2 target = dir * max_speed;
+        float dt = ms / 1000.0f;
+        auto new_vel = cur;
+
+        Vec2 target = dir;
+        if (target.length() > 1e-6f)
+            target = target.normalize() * max_speed;
+        else
+            target = Vec2(0, 0);
 
         switch (mode)
         {
         case MovementMode::Instant:
-            return target;
+            new_vel = target;
+            break;
         case MovementMode::Linear:
-            return move_towards(cur, target, ms);
+            new_vel = move_towards(cur, target, ms);
+            break;
         case MovementMode::LinearAccelInstantStop:
             if (dir.length() <= 1e-6)
-                return Vec2();
+                new_vel = Vec2(0, 0);
             else
-                return move_towards(cur, target, ms);
+                new_vel = move_towards(cur, target, ms);
+            break;
         case MovementMode::InstantAccelSmoothStop:
             if (dir.length() > 1e-6)
-                return target;
+                new_vel = target;
             else
-                return move_towards(cur, {}, ms);
+                new_vel = move_towards(cur, {}, ms);
+            break;
         }
-        return cur;
+
+        return new_vel;
     }
 
 private:

@@ -43,7 +43,6 @@ public:
 
     void on_update(float ms)
     {
-
         float delta = ms / 1000;
         float delta_pos_x = delta * m_speed.get_x();
         float delta_pos_y = delta * m_speed.get_y();

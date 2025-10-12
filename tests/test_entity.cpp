@@ -101,7 +101,7 @@ int main()
         if (imanager.is_key_pressed(SDL_SCANCODE_D))
             move_direction.set_x(move_direction.get_x() + 1.0f);
 
-        if (move_direction.length() > 0)
+        if (move_direction.length() > 1e-6)
         {
             stm.switch_to("run");
             player->set_move_direction(move_direction);
