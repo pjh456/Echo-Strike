@@ -22,7 +22,20 @@ Entity::~Entity()
 
 void Entity::on_update(float ms)
 {
+    if (std::abs(m_speed.get_x()) > 1e-6)
+        m_is_moving = true;
+    else
+        m_is_moving = false;
+
     Object::on_update(ms);
+
+    if (m_rect.top() >= m_boundary.top())
+        m_is_on_floor = true;
+    else if (m_speed.get_y() >= 0)
+        m_is_falling = true;
+    else
+        m_is_jumping = true;
+
     anim_sm.on_update(ms);
 }
 
@@ -34,6 +47,8 @@ void Entity::on_render(Renderer *renderer)
 
     if (auto ptr = dynamic_cast<EntityState *>(raw_ptr))
     {
+        ptr->get_anim().set_position(m_rect.get_position());
+
         auto frame_size = ptr->get_anim().get_current_frame().src.get_size();
         m_rect.set_size(frame_size);
 

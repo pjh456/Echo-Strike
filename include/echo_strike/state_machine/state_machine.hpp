@@ -1,6 +1,7 @@
 #ifndef INCLUDE_STATE_MACHINE
 #define INCLUDE_STATE_MACHINE
 
+#include <echo_strike/state_machine/transition.hpp>
 #include <echo_strike/state_machine/state_node.hpp>
 
 #include <string>
@@ -8,8 +9,11 @@
 
 class StateMachine
 {
+public:
+    using StateTable = std::unordered_map<std::string, StateNode *>;
+
 private:
-    std::unordered_map<std::string, StateNode *> states;
+    StateTable states;
     StateNode *current_state = nullptr;
 
     bool is_init = false;
@@ -36,6 +40,15 @@ public:
         {
             current_state->on_enter();
             is_init = true;
+        }
+
+        for (const auto &transition : current_state->get_transitions())
+        {
+            if (transition.condition())
+            {
+                switch_to(transition.target_state_name);
+                return;
+            }
         }
 
         current_state->on_update(delta);
@@ -65,10 +78,11 @@ public:
         }
     }
 
-    void register_state(const std::string &name, StateNode *state)
-    {
-        states[name] = state;
-    }
+    void register_state(const std::string &name, StateNode *state) { states[name] = state; }
+
+public:
+    StateTable &get_states() { return states; }
+    const StateTable &get_states() const { return states; }
 };
 
 #endif // INCLUDE_STATE_MACHINE

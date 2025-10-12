@@ -27,6 +27,13 @@ protected:
     CollisionBox *m_hurt_box;
 
 protected:
+    bool m_is_on_floor = false;
+    bool m_is_falling = false;
+    bool m_is_jumping = false;
+    bool m_is_moving = false;
+    bool m_is_facing_right = true;
+
+protected:
     Entity();
 
 public:
@@ -68,6 +75,13 @@ public:
 
     CollisionBox *get_hurt_box() const { return m_hurt_box; }
     void set_hurt_box(CollisionBox *);
+
+public:
+    bool is_on_floor() const { return m_is_on_floor; }
+    bool is_falling() const { return m_is_falling; }
+    bool is_jumping() const { return m_is_jumping; }
+    bool is_moving() const { return m_is_moving; }
+    bool is_facing_right() const { return m_is_facing_right; }
 };
 
 #endif // INCLUDE_ENTITY
