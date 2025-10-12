@@ -21,6 +21,8 @@ int main()
     std::uniform_real_distribution<float> speed_dist(100.0f, 300.0f);
     Uint64 prev_ticks = SDL_GetTicks();
 
+    Rect boundary{0, 0, 800, 600};
+
     while (running)
     {
         Uint64 current_ticks = SDL_GetTicks();
@@ -46,6 +48,8 @@ int main()
                 p.set_rect(Rect(0, 0, 25, 25));
                 p.set_speed(velocity);
                 p.set_force(Vec2(0, 0));
+                p.set_type(Object::MotionType::LimitedInBoundary);
+                p.set_boundary(boundary);
 
                 particles.push_back(p);
             }
