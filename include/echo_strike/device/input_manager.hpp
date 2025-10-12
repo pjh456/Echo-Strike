@@ -15,6 +15,16 @@ private:
     std::unordered_map<Uint8, bool> mouse_states;
     int mouseX = 0, mouseY = 0;
 
+private:
+    InputManager() = default;
+    ~InputManager() = default;
+
+    InputManager(const InputManager &) = delete;
+    InputManager &operator=(const InputManager &) = delete;
+
+    InputManager(InputManager &&) noexcept = delete;
+    InputManager &operator=(InputManager &) noexcept = delete;
+
 public:
     void update();
 
