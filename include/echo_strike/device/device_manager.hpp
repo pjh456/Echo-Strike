@@ -13,9 +13,15 @@ private:
     Window *window = nullptr;
     Renderer *renderer = nullptr;
 
-public:
+private:
     DeviceManager() = default;
     ~DeviceManager() = default;
+
+    DeviceManager(const DeviceManager &) = delete;
+    DeviceManager &operator=(const DeviceManager &) = delete;
+
+    DeviceManager(DeviceManager &&) noexcept = delete;
+    DeviceManager &operator=(DeviceManager &&) noexcept = delete;
 
 public:
     Window *get_window() const { return window; }
