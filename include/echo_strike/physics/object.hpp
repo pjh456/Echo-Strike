@@ -18,11 +18,12 @@ public:
     };
 
 protected:
+    MotionType m_type = MotionType::IgnoreBoundary;
+
     CLASS_PROPERTY(Rect, rect)
     CLASS_PROPERTY(Vec2, speed)
     CLASS_PROPERTY(Vec2, force)
     CLASS_PROPERTY(Rect, boundary)
-    CLASS_PROPERTY(MotionType, type)
 
 public:
     Object() = default;
@@ -36,8 +37,9 @@ public:
     virtual void render_border(SDL_Renderer *renderer) const { m_rect.render_border(renderer); }
     virtual void render_full(SDL_Renderer *renderer) const { m_rect.render_full(renderer); }
 
-    void on_update(float delta)
+    void on_update(float ms)
     {
+        float delta = ms / 1000;
         float delta_pos_x = delta * m_speed.get_x();
         float delta_pos_y = delta * m_speed.get_y();
         m_rect.set_x(m_rect.get_x() + delta_pos_x);
@@ -64,6 +66,10 @@ public:
             m_rect.set_position(pos);
         }
     }
+
+public:
+    MotionType get_type() const { return m_type; }
+    void set_type(MotionType t) { m_type = t; }
 };
 
 #endif // INCLUDE_OBJECT
