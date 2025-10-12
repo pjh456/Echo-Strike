@@ -23,7 +23,7 @@ Animation::~Animation()
 Animation::Animation(Animation &&other) noexcept
     : m_interval(other.m_interval),
       timer(std::move(other.timer)),
-      frames(std::move(frames)),
+      frames(std::move(other.frames)),
       frame_idx(other.frame_idx),
       m_position(other.m_position),
       m_anchor_mode(other.m_anchor_mode)
@@ -141,28 +141,6 @@ void Animation::render(SDL_Renderer *renderer) const
     auto temp_src = frame.src.to_frect();
     SDL_RenderTexture(renderer, frame.img->get_texture(), &temp_src, &dst);
 }
-
-// void Animation::render(Renderer *renderer) const
-// {
-//     if (frames.empty())
-//         return;
-
-//     auto frame = get_current_frame();
-
-//     // 世界坐标矩形（逻辑空间）
-//     auto dst = Rect(m_position, Vec2(frame.img->get_width(), frame.img->get_height()));
-
-//     if (m_anchor_mode == AnchorMode::BottomCentered)
-//         dst.set_y(dst.get_y() + frame.img->get_height());
-//     else
-//         dst.set_y(dst.get_y() + (frame.img->get_height() / 2));
-
-//     if (renderer && renderer->get_camera())
-//         dst = renderer->get_camera()->world_to_screen(dst);
-
-//     auto temp_src = frame.src.to_frect();
-//     renderer->draw_texture(frame.img->get_texture(), &frame.src, &dst);
-// }
 
 void Animation::render(Renderer *renderer) const
 {
