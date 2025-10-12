@@ -1,6 +1,8 @@
 #ifndef INCLUDE_WINDOW
 #define INCLUDE_WINDOW
 
+#include <echo_strike/utils/vec2.hpp>
+
 #include <cstdint>
 #include <string>
 #include <utility>
