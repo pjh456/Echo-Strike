@@ -4,6 +4,25 @@
         "decel_rate": 500.0,
         "max_speed": 500.0
     },
+    "animations": {
+        "player": [
+            {
+                "name": "idle",
+                "key": "player/idle.png",
+                "interval": 100.0
+            },
+            {
+                "name": "run",
+                "key": "player/run.png",
+                "interval": 50.0
+            },
+            {
+                "name": "attack",
+                "key": "player/attack.png",
+                "interval": 50.0
+            }
+        ]
+    },
     "sprite_cut": {
         "ui_heart.png": {
             "rows": 1,

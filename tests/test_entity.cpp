@@ -54,22 +54,18 @@ int main()
 
     auto &stm = player->get_state_machine();
 
-    auto [idle_key, idle_anim] = rmanager.load_atlas_cache("player/idle.png");
-    auto [run_key, run_anim] = rmanager.load_atlas_cache("player/run.png");
-
-    if (idle_anim)
+    auto player_anims = config["animations"]["player"].get()->as_array()->as_vector();
+    for (auto anim : player_anims)
     {
-        auto idle_node = new EntityState(player);
-        idle_node->get_anim().add_frames(*idle_anim);
-        idle_node->get_anim().set_interval(100);
-        stm.register_state("idle", idle_node);
-    }
-    if (run_anim)
-    {
-        auto run_node = new EntityState(player);
-        run_node->get_anim().add_frames(*run_anim);
-        run_node->get_anim().set_interval(50);
-        stm.register_state("run", run_node);
+        auto obj = pjh_std::json::Ref(anim->as_object());
+        auto [anim_key, anim_cache] = rmanager.load_atlas_cache(obj["key"].as_str());
+        if (anim_cache)
+        {
+            auto anim_node = new EntityState(player);
+            anim_node->get_anim().add_frames(*anim_cache);
+            anim_node->get_anim().set_interval(obj["interval"].as_float());
+            stm.register_state(obj["name"].as_str(), anim_node);
+        }
     }
 
     stm.set_entry("idle");
