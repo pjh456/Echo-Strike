@@ -6,7 +6,7 @@
 
 PhysicalObject::PhysicalObject()
     : box(*CollisionManager::instance().create_collision_box()),
-      m_mass(1.0)
+      Object()
 {
     box.set_object(this);
     box.set_src(CollisionLayer::Physics);
@@ -244,8 +244,8 @@ void PhysicalObject::handle_collision_response(PhysicalObject &other)
 
     Vec2 u1 = this->get_speed();
     Vec2 u2 = other.get_speed();
-    float m1 = this->get_mess();
-    float m2 = other.get_mess();
+    float m1 = this->get_mass();
+    float m2 = other.get_mass();
 
     Vec2 relative_velocity = u2 - u1;
     float vel_along_normal = relative_velocity.dot(contact_normal); // 使用点积更标准
